@@ -3,9 +3,10 @@ services:
     name: stayphere-backend
     env: node
     plan: free
-    repo: https://github.com/your-username/stayphere # You will likely select the repo in UI, but this is standard format
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    repo: https://github.com/Shivtej-07/Stayphere # Updated repo URL
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: MONGO_URI
         sync: false
@@ -20,19 +21,9 @@ services:
     name: stayphere-frontend
     env: static
     plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./frontend/dist 
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: stayphere-backend
-          envVarKey: RenderUrl  # Usually we just use the URL, but Render creates an internal URL. 
-          # Actually, for static sites, we need the public URL.
-          # Render exposes content via RENDER_EXTERNAL_URL in the backend service, 
-          # but we can't easily reference it here for build time injection in a static site dependent on a web service? 
-          # Actually, usually users just paste the backend URL.
-          # For now, let's leave it as a sync: false so user has to input it, OR assume they will set it.
-          # Better: Use the 'fromService' to get the host, but for Client-Side rendering it needs the public URL.
-          # Render's `onDeploy` might help, but let's keep it simple.
         sync: false 
