@@ -4,10 +4,9 @@ const User = require('./models/User');
 const connectDB = require('./config/db');
 
 dotenv.config();
-connectDB();
-
 const seedAdmin = async () => {
     try {
+        await connectDB();
         await User.deleteMany({ email: 'admin@example.com' });
 
         const adminUser = await User.create({

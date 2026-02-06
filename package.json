@@ -1,0 +1,14 @@
+{
+    "name": "stayphere-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install-all": "cd backend && npm install && cd ../frontend && npm install",
+        "build": "cd frontend && npm install && npm run build",
+        "start": "cd backend && npm start",
+        "dev": "echo 'WARNING: You are running npm run dev in production root. Retrying backend...' && cd backend && npm run dev"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}
