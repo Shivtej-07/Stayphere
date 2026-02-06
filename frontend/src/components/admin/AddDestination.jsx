@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const AddDestination = ({ setMessage, onSuccess }) => {
     const [destinationData, setDestinationData] = useState({
@@ -24,7 +25,7 @@ const AddDestination = ({ setMessage, onSuccess }) => {
             };
 
             console.log('Payload:', payload);
-            const res = await axios.post('http://localhost:5000/api/destinations', payload, config);
+            const res = await axios.post(`${API_BASE_URL}/destinations`, payload, config);
             console.log('Response:', res.data);
 
             setMessage('Destination added successfully!');

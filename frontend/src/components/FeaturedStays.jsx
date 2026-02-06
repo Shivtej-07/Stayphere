@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Star, MapPin, ArrowRight } from 'lucide-react';
 import BookingModal from './BookingModal';
+import { API_BASE_URL } from '../config';
 
 const TiltCard = ({ children, onClick }) => {
     const cardRef = useRef(null);
@@ -61,7 +62,7 @@ const FeaturedStays = () => {
         const fetchFeaturedStays = async () => {
             try {
                 // Fetch all hotels and take the first 3 (or filter by featured if API supported it)
-                const response = await fetch('http://localhost:5000/api/hotels');
+                const response = await fetch(`${API_BASE_URL}/hotels`);
                 if (!response.ok) throw new Error('Failed to fetch hotels');
                 const json = await response.json();
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, MapPin, Loader2, Image as ImageIcon, Star, Pencil, X, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const ManageDestinations = ({ setMessage, refreshTrigger }) => {
     const [destinations, setDestinations] = useState([]);
@@ -10,7 +11,7 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
     const fetchDestinations = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/destinations');
+            const res = await axios.get(`${API_BASE_URL}/destinations`);
             setDestinations(res.data || []);
         } catch (error) {
             console.error('Error fetching destinations:', error);
@@ -33,7 +34,7 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`http://localhost:5000/api/destinations/${id}`, config);
+                await axios.delete(`${API_BASE_URL}/destinations/${id}`, config);
                 setMessage('Destination deleted successfully');
                 fetchDestinations();
             } catch (error) {
@@ -62,7 +63,7 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
                     : editingDestination.photos
             };
 
-            await axios.put(`http://localhost:5000/api/destinations/${editingDestination._id}`, payload, config);
+            await axios.put(`${API_BASE_URL}/destinations/${editingDestination._id}`, payload, config);
             setMessage('Destination updated successfully');
             setEditingDestination(null);
             fetchDestinations();

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, ArrowLeft, Wifi, Coffee, Car, Utensils, Camera, Map as MapIcon } from 'lucide-react';
 import MapComponent from '../components/MapComponent';
 import BookingModal from '../components/BookingModal';
+import { API_BASE_URL } from '../config';
 
 const StayDetails = () => {
     const { id } = useParams();
@@ -82,7 +83,7 @@ const StayDetails = () => {
             } else {
                 // Fetch from API
                 try {
-                    const response = await fetch('http://localhost:5000/api/hotels');
+                    const response = await fetch(`${API_BASE_URL}/hotels`);
                     if (response.ok) {
                         const json = await response.json();
                         const apiStay = (json.data || []).find(s => s._id === id);

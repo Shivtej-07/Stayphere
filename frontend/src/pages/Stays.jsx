@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, MapPin, Star, Filter, ArrowRight, Eye, Clock, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BookingModal from '../components/BookingModal';
+import { API_BASE_URL } from '../config';
 
 const categories = ["All", "Beach", "Mountain", "City", "Countryside", "Luxury"];
 
@@ -78,7 +79,7 @@ const Stays = () => {
     React.useEffect(() => {
         const fetchStays = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/hotels');
+                const response = await fetch(`${API_BASE_URL}/hotels`);
                 if (!response.ok) throw new Error('Failed to fetch hotels');
                 const json = await response.json();
 

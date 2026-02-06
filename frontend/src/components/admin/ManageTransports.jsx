@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Calendar, DollarSign, Car, Loader2, ArrowRight } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const ManageTransports = ({ setMessage, refreshTrigger }) => {
     const [transports, setTransports] = useState([]);
@@ -9,7 +10,7 @@ const ManageTransports = ({ setMessage, refreshTrigger }) => {
     const fetchTransports = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/transports');
+            const res = await axios.get(`${API_BASE_URL}/transports`);
             setTransports(res.data || []);
         } catch (error) {
             console.error('Error fetching transports:', error);
@@ -32,7 +33,7 @@ const ManageTransports = ({ setMessage, refreshTrigger }) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`http://localhost:5000/api/transports/${id}`, config);
+                await axios.delete(`${API_BASE_URL}/transports/${id}`, config);
                 setMessage('Transport deleted successfully');
                 fetchTransports();
             } catch (error) {

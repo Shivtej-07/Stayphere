@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Search, ArrowRight, Home, CreditCard } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const MyBookings = () => {
     const [bookings, setBookings] = useState([]);
@@ -17,7 +18,7 @@ const MyBookings = () => {
                     return;
                 }
 
-                const res = await fetch('http://localhost:5000/api/bookings/my-bookings', {
+                const res = await fetch(`${API_BASE_URL}/bookings/my-bookings`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const AddHotel = ({ setMessage, onSuccess }) => {
     const [hotelData, setHotelData] = useState({
@@ -20,7 +21,7 @@ const AddHotel = ({ setMessage, onSuccess }) => {
                 ...hotelData,
                 photos: hotelData.photos ? hotelData.photos.split(',').map(p => p.trim()).filter(p => p !== '') : []
             };
-            await axios.post('http://localhost:5000/api/hotels', payload, config);
+            await axios.post(`${API_BASE_URL}/hotels`, payload, config);
             setMessage('Hotel added successfully!');
             setHotelData({ name: '', type: '', city: '', address: '', distance: '', title: '', description: '', cheapestPrice: 0, featured: false, photos: '' });
             if (onSuccess) onSuccess();

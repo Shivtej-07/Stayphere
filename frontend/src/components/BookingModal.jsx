@@ -3,6 +3,7 @@ import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2 } from 'lucid
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './CheckoutForm';
+import { API_BASE_URL } from '../config';
 
 const stripePromise = loadStripe("pk_test_51RxejZPSVmcc3eBkvjEuMzJoMGGUIUoVwE9wwhMkRaCX0jBdQFDMR4cvINi5VHmACuiHmRvxJPtRxaTqo6AJnx1M00flLHoRs5");
 
@@ -35,7 +36,7 @@ const BookingModal = ({ isOpen, onClose, property }) => {
         if (step === 2 && !clientSecret && property) {
             const amount = getPriceAmount(property.price);
 
-            fetch("http://localhost:5000/api/payments/create-payment-intent", {
+            fetch(`${API_BASE_URL}/payments/create-payment-intent`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount }),
@@ -92,7 +93,7 @@ const BookingModal = ({ isOpen, onClose, property }) => {
                 paymentId: paymentId
             };
 
-            const res = await fetch('http://localhost:5000/api/bookings', {
+            const res = await fetch(`${API_BASE_URL}/bookings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

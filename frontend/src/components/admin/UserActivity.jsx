@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Users, Calendar, Shield, ShieldCheck, Mail, Loader2, CreditCard } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const UserActivity = ({ setMessage, refreshTrigger }) => {
     const [users, setUsers] = useState([]);
@@ -23,12 +24,12 @@ const UserActivity = ({ setMessage, refreshTrigger }) => {
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
             console.log('UserActivity: Fetching users...');
-            const usersRes = await axios.get('http://localhost:5000/api/auth/users', config);
+            const usersRes = await axios.get(`${API_BASE_URL}/auth/users`, config);
             console.log('UserActivity: Users fetched:', usersRes.data.length);
             setUsers(usersRes.data);
 
             console.log('UserActivity: Fetching bookings...');
-            const bookingsRes = await axios.get('http://localhost:5000/api/bookings', config);
+            const bookingsRes = await axios.get(`${API_BASE_URL}/bookings`, config);
             console.log('UserActivity: Bookings fetched:', bookingsRes.data.length);
             setBookings(bookingsRes.data);
         } catch (error) {
@@ -56,7 +57,7 @@ const UserActivity = ({ setMessage, refreshTrigger }) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`http://localhost:5000/api/auth/users/${id}`, config);
+                await axios.delete(`${API_BASE_URL}/auth/users/${id}`, config);
                 fetchUserActivity(); // Refresh list
                 setMessage('User deleted successfully');
             } catch (error) {
@@ -70,7 +71,7 @@ const UserActivity = ({ setMessage, refreshTrigger }) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`http://localhost:5000/api/bookings/${id}`, config);
+                await axios.delete(`${API_BASE_URL}/bookings/${id}`, config);
                 fetchUserActivity(); // Refresh list
                 setMessage('Booking deleted successfully');
             } catch (error) {

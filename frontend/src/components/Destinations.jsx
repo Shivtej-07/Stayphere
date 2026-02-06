@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, TrendingUp, MapPin } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 const Destinations = () => {
     const [destinations, setDestinations] = useState([]);
@@ -9,7 +10,7 @@ const Destinations = () => {
             try {
                 // Assuming API_BASE_URL is imported or using relative path if proxy is set up
                 // Using full localhost URL as per other components if needed, or importing config
-                const response = await fetch('http://localhost:5000/api/destinations');
+                const response = await fetch(`${API_BASE_URL}/destinations`);
                 const data = await response.json();
                 // Map API data to component structure if different
                 // API returns: { name, description, photos, featured, ... }

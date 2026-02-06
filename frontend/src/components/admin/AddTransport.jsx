@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Plus, Calendar, Clock } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const AddTransport = ({ setMessage, onSuccess }) => {
     const [transportData, setTransportData] = useState({
@@ -20,7 +21,7 @@ const AddTransport = ({ setMessage, onSuccess }) => {
                 ...transportData,
                 photos: transportData.photos ? transportData.photos.split(',').map(p => p.trim()) : []
             };
-            await axios.post('http://localhost:5000/api/transports', payload, config);
+            await axios.post(`${API_BASE_URL}/transports`, payload, config);
             setMessage('Transport added successfully!');
             setTransportData({ type: 'flight', company: '', from: '', to: '', departureTime: '', arrivalTime: '', price: 0, seatsAvailable: 0, photos: '' });
             if (onSuccess) onSuccess();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, MapPin, DollarSign, Building, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const ManageHotels = ({ setMessage, refreshTrigger }) => {
     const [hotels, setHotels] = useState([]);
@@ -9,7 +10,7 @@ const ManageHotels = ({ setMessage, refreshTrigger }) => {
     const fetchHotels = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/hotels');
+            const res = await axios.get(`${API_BASE_URL}/hotels`);
             setHotels(res.data.data || []);
         } catch (error) {
             console.error('Error fetching hotels:', error);
@@ -32,7 +33,7 @@ const ManageHotels = ({ setMessage, refreshTrigger }) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                await axios.delete(`http://localhost:5000/api/hotels/${id}`, config);
+                await axios.delete(`${API_BASE_URL}/hotels/${id}`, config);
                 setMessage('Hotel deleted successfully');
                 fetchHotels();
             } catch (error) {
