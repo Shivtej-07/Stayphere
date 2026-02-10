@@ -12,10 +12,14 @@ import Transport from './pages/Transport';
 
 import AdminDashboard from './pages/AdminDashboard';
 import StayDetails from './pages/StayDetails';
+import DestinationDetails from './pages/DestinationDetails';
+
+import ConnectionErrorBanner from './components/ConnectionErrorBanner';
 
 const Layout = ({ children }) => {
   return (
     <>
+      <ConnectionErrorBanner />
       <Navbar />
       {children}
       <Footer />
@@ -34,6 +38,7 @@ function App() {
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/stays" element={<Layout><Stays /></Layout>} />
           <Route path="/stays/:id" element={<Layout><StayDetails /></Layout>} />
+          <Route path="/destinations/:id" element={<Layout><DestinationDetails /></Layout>} />
           <Route path="/transport" element={<Layout><Transport /></Layout>} />
           <Route path="/about" element={<Layout><div className="pt-24 text-center">About Page (Coming Soon)</div></Layout>} />
           <Route path="/login" element={<Layout><Login /></Layout>} />

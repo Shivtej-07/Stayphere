@@ -11,15 +11,8 @@ const BookingModal = ({ isOpen, onClose, property }) => {
     const [step, setStep] = useState(1);
     const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
-    const [isProcessing, setIsProcessing] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState(null); // 'card', 'gpay', 'phonepe', 'paytm', 'qr'
     const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle', 'processing', 'success'
-    const [paymentDetails, setPaymentDetails] = useState({
-        cardNumber: '',
-        expiry: '',
-        cvc: '',
-        name: ''
-    });
     const [clientSecret, setClientSecret] = useState("");
 
     // Helper to safely get price amount as number
@@ -59,17 +52,6 @@ const BookingModal = ({ isOpen, onClose, property }) => {
         };
     }, [step, clientSecret, property]);
 
-    // Reset state when modal opens
-    useEffect(() => {
-        if (isOpen) {
-            setStep(1);
-            setIsProcessing(false);
-            setPaymentMethod(null);
-            setPaymentStatus('idle');
-            setClientSecret("");
-        }
-    }, [isOpen]);
-
     if (!isOpen || !property) return null;
 
     const handleDetailsSubmit = (e) => {
@@ -104,7 +86,6 @@ const BookingModal = ({ isOpen, onClose, property }) => {
 
             if (res.ok) {
                 setPaymentStatus('success');
-                setIsProcessing(false); // Stop any processing spinners
                 setStep(3);
             } else {
                 console.error("Failed to create booking record");
@@ -123,7 +104,6 @@ const BookingModal = ({ isOpen, onClose, property }) => {
     const handleUPIPayment = (app) => {
         setPaymentMethod(app);
         setPaymentStatus('processing');
-        setIsProcessing(true);
 
         // REAL UPI CONFIGURATION
         // REPLACE 'merchant@upi' WITH YOUR ACTUAL VPA

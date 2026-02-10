@@ -56,11 +56,19 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
+            // Sanitize payload: remove _id, __v, createdAt, updatedAt
+            const { _id, __v, createdAt, updatedAt, ...cleanDestination } = editingDestination;
+
+            // Process photos: split by comma, trim, remove quotes, filter empty
+            const processedPhotos = typeof editingDestination.photos === 'string'
+                ? editingDestination.photos.split(',')
+                    .map(p => p.trim().replace(/['"]/g, '')) // Remove quotes
+                    .filter(p => p !== '')
+                : editingDestination.photos;
+
             const payload = {
-                ...editingDestination,
-                photos: typeof editingDestination.photos === 'string'
-                    ? editingDestination.photos.split(',').map(p => p.trim()).filter(p => p !== '')
-                    : editingDestination.photos
+                ...cleanDestination,
+                photos: processedPhotos
             };
 
             await axios.put(`${API_BASE_URL}/destinations/${editingDestination._id}`, payload, config);
@@ -111,9 +119,24 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-gray-300">
-                                            <div className="flex items-center gap-1.5">
-                                                <ImageIcon size={14} className="text-gray-500" />
-                                                {item.photos?.length || 0}
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-md overflow-hidden bg-white/5 border border-white/10 shrink-0">
+                                                    {item.photos && item.photos.length > 0 ? (
+                                                        <img
+                                                            src={item.photos[0]}
+                                                            alt={item.name}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { e.target.style.display = 'none' }}
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-600">
+                                                            <ImageIcon size={16} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span className="text-xs text-gray-500">
+                                                    {item.photos?.length || 0} images
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -150,7 +173,7 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
             {/* Edit Modal */}
             {editingDestination && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up">
+                    <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up max-h-[90vh] flex flex-col">
                         <div className="flex items-center justify-between p-6 border-b border-white/10 bg-slate-800/50">
                             <h3 className="text-xl font-bold text-white">Edit Destination</h3>
                             <button
@@ -161,7 +184,7 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
                             </button>
                         </div>
 
-                        <form onSubmit={handleUpdate} className="p-6 space-y-4">
+                        <form onSubmit={handleUpdate} className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Name</label>
                                 <input
@@ -185,12 +208,27 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Photos (Comma separated URLs)</label>
-                                <input
-                                    type="text"
+                                <p className="text-xs text-gray-500 mb-2">First image is the cover. Use valid URLs without quotes.</p>
+                                <textarea
                                     value={editingDestination.photos}
                                     onChange={(e) => setEditingDestination({ ...editingDestination, photos: e.target.value })}
-                                    className="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-pink-500 focus:outline-none transition-colors"
+                                    className="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-pink-500 focus:outline-none transition-colors h-20 text-xs font-mono"
+                                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                                 />
+                                {/* Live Preview of First Image */}
+                                {editingDestination.photos && editingDestination.photos.length > 0 && (
+                                    <div className="mt-2">
+                                        <p className="text-xs text-gray-500 mb-1">Cover Preview:</p>
+                                        <div className="w-full h-32 rounded-lg overflow-hidden border border-white/10 bg-black/20">
+                                            <img
+                                                src={typeof editingDestination.photos === 'string' ? editingDestination.photos.split(',')[0].replace(/['"]/g, '').trim() : editingDestination.photos[0]}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.style.display = 'none' }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5 w-fit">

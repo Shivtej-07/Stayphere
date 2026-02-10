@@ -55,9 +55,23 @@ const deleteDestination = async (req, res) => {
     }
 };
 
+// @desc    Get single destination
+// @route   GET /api/destinations/:id
+// @access  Public
+const getDestinationById = async (req, res) => {
+    try {
+        const destination = await Destination.findById(req.params.id);
+        if (!destination) return res.status(404).json({ message: 'Destination not found' });
+        res.json(destination);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getDestinations,
     createDestination,
     updateDestination,
-    deleteDestination
+    deleteDestination,
+    getDestinationById
 };

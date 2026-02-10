@@ -167,11 +167,13 @@ const FeaturedStays = () => {
                 </div>
             </section>
 
-            <BookingModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                property={selectedStay}
-            />
+            {isModalOpen && (
+                <BookingModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    property={selectedStay}
+                />
+            )}
         </>
     );
 };

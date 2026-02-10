@@ -4,12 +4,14 @@ const {
     getDestinations,
     createDestination,
     updateDestination,
-    deleteDestination
+    deleteDestination,
+    getDestinationById
 } = require('../controllers/destinationController');
 const { protect, admin } = require('../middleware/adminMiddleware');
 
 router.route('/').get(getDestinations).post(protect, admin, createDestination);
 router.route('/:id')
+    .get(getDestinationById)
     .put(protect, admin, updateDestination)
     .delete(protect, admin, deleteDestination);
 

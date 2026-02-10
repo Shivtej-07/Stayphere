@@ -1,0 +1,163 @@
+[
+  {
+    "_id": "698a9a5350745a22d1870248",
+    "name": "Paris, France",
+    "description": "The City of Light, known for the Eiffel Tower, Louvre Museum, and charming cafes.",
+    "photos": [
+      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1499856871940-a09c27bab909?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870249",
+    "name": "Bali, Indonesia",
+    "description": "Tropical paradise with beautiful beaches, rice terraces, and vibrant culture.",
+    "photos": [
+      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024a",
+    "name": "New York City, USA",
+    "description": "The Big Apple, famous for Times Square, Central Park, and Broadway.",
+    "photos": [
+      "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1500916434205-0c77489c6cf7?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": false,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024b",
+    "name": "Kedarnath Temple, Uttarakhand",
+    "description": "One of the most sacred Hindu temples dedicated to Lord Shiva, located in the Garhwal Himalayas.",
+    "photos": [
+      "https://images.unsplash.com/photo-1616859353916-2c938c5c7d0e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1590455088258-20a2298c5545?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1589136709833-286a11e1f544?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1605626245053-29472ee9180c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024c",
+    "name": "Badrinath Temple, Uttarakhand",
+    "description": "Dedicated to Lord Vishnu, Badrinath is a major pilgrimage site and part of the Char Dham.",
+    "photos": [
+      "https://images.unsplash.com/photo-1624694406248-2621a644f807?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1626245199613-207d58933bc6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1517524953934-2e947d1a58df?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571597437877-0335eef77a28?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024d",
+    "name": "Golden Temple, Amritsar",
+    "description": "The holiest Gurdwara of Sikhism, also known as Sri Harmandir Sahib.",
+    "photos": [
+      "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582236873539-75618b26b3e1?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1628151016629-6705d8349756?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1634629377473-82f534fd779c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024e",
+    "name": "Tirupati Balaji, Andhra Pradesh",
+    "description": "A landmark Vaishnavite temple dedicated to Lord Venkateswara.",
+    "photos": [
+      "https://images.unsplash.com/photo-1623945934149-d7c813735164?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1605626245053-29472ee9180c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1643261962363-222eb6139cd3?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1598555230912-143714652277?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d187024f",
+    "name": "Rameswaram Temple, Tamil Nadu",
+    "description": "A Hindu temple dedicated to the god Shiva located on Rameswaram island.",
+    "photos": [
+      "https://images.unsplash.com/photo-1628151015968-3a4429e9ef04?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1605626245053-29472ee9180c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582555696516-7243c4ae5f86?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1590455088258-20a2298c5545?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870250",
+    "name": "Konark Sun Temple, Odisha",
+    "description": "A 13th-century CE Sun Temple at Konark, dedicated to the Hindu sun god Surya.",
+    "photos": [
+      "https://images.unsplash.com/photo-1598207951491-255eaf13b376?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1628151016023-b1d5c22502c3?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1624694406248-2621a644f807?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": false,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870251",
+    "name": "Meenakshi Amman Temple, Madurai",
+    "description": "A historic Hindu temple located on the southern bank of the Vaigai River.",
+    "photos": [
+      "https://images.unsplash.com/photo-1644302258836-8aed59937172?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1589136709833-286a11e1f544?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582236873539-75618b26b3e1?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870252",
+    "name": "Virupaksha Temple, Hampi",
+    "description": "Part of the Group of Monuments at Hampi, designated as a UNESCO World Heritage Site.",
+    "photos": [
+      "https://images.unsplash.com/photo-1600100598004-94b29bb64525?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1623945934149-d7c813735164?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1605626245053-29472ee9180c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870253",
+    "name": "Prem Mandir, Vrindavan",
+    "description": "A massive temple complex related to Radha Krishna and Sita Ram.",
+    "photos": [
+      "https://images.unsplash.com/photo-1678788931557-ca5e7f0c4515?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1598555230912-143714652277?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571597437877-0335eef77a28?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": true,
+    "__v": 0
+  },
+  {
+    "_id": "698a9a5350745a22d1870254",
+    "name": "Somnath Temple, Gujarat",
+    "description": "The first among the twelve Jyotirlinga shrines of Shiva.",
+    "photos": [
+      "https://images.unsplash.com/photo-1628522384964-b81628d01d4a?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1590455088258-20a2298c5545?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1624694406248-2621a644f807?auto=format&fit=crop&w=800&q=80"
+    ],
+    "featured": false,
+    "__v": 0
+  }
+]
