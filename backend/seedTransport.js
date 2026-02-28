@@ -11,14 +11,17 @@ const seedTransports = async () => {
 
         await Transport.deleteMany(); // Clear existing data
 
+        const d = new Date();
+        const futureDate = (days, hours = 0, minutes = 0) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + days, d.getHours() + hours, d.getMinutes() + minutes);
+
         const transports = [
             {
                 type: 'flight',
                 company: 'SkyHigh Airways',
                 from: 'New York',
                 to: 'London',
-                departureTime: new Date(new Date().setDate(new Date().getDate() + 1)), // Tomorrow
-                arrivalTime: new Date(new Date().setDate(new Date().getDate() + 1)),
+                departureTime: futureDate(1),
+                arrivalTime: futureDate(1, 7, 30),
                 price: 450,
                 seatsAvailable: 120
             },
@@ -27,8 +30,8 @@ const seedTransports = async () => {
                 company: 'FastTrack Rail',
                 from: 'Paris',
                 to: 'Berlin',
-                departureTime: new Date(new Date().setDate(new Date().getDate() + 2)),
-                arrivalTime: new Date(new Date().setDate(new Date().getDate() + 2)),
+                departureTime: futureDate(2),
+                arrivalTime: futureDate(2, 5, 45),
                 price: 120,
                 seatsAvailable: 300
             },
@@ -37,8 +40,8 @@ const seedTransports = async () => {
                 company: 'RoadRunner',
                 from: 'London',
                 to: 'Manchester',
-                departureTime: new Date(new Date().setDate(new Date().getDate() + 3)),
-                arrivalTime: new Date(new Date().setDate(new Date().getDate() + 3)),
+                departureTime: futureDate(3),
+                arrivalTime: futureDate(3, 4, 15),
                 price: 35,
                 seatsAvailable: 50
             },
@@ -47,8 +50,8 @@ const seedTransports = async () => {
                 company: 'Uber',
                 from: 'Downtown',
                 to: 'Airport',
-                departureTime: new Date(),
-                arrivalTime: new Date(),
+                departureTime: futureDate(0),
+                arrivalTime: futureDate(0, 0, 45),
                 price: 45,
                 seatsAvailable: 3
             },
@@ -57,8 +60,8 @@ const seedTransports = async () => {
                 company: 'Oceanic Airlines',
                 from: 'Los Angeles',
                 to: 'Sydney',
-                departureTime: new Date(new Date().setDate(new Date().getDate() + 5)),
-                arrivalTime: new Date(new Date().setDate(new Date().getDate() + 6)),
+                departureTime: futureDate(5),
+                arrivalTime: futureDate(5, 14, 20),
                 price: 850,
                 seatsAvailable: 200
             }

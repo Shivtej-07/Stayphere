@@ -13,6 +13,7 @@ import Transport from './pages/Transport';
 import AdminDashboard from './pages/AdminDashboard';
 import StayDetails from './pages/StayDetails';
 import DestinationDetails from './pages/DestinationDetails';
+import Favorites from './pages/Favorites';
 
 import ConnectionErrorBanner from './components/ConnectionErrorBanner';
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="/about" element={<Layout><div className="pt-24 text-center">About Page (Coming Soon)</div></Layout>} />
           <Route path="/login" element={<Layout><Login /></Layout>} />
           <Route path="/my-bookings" element={<Layout><MyBookings /></Layout>} />
+          <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
 
           {/* Admin Route without Navbar */}
           <Route path="/admin" element={<AdminDashboard />} />

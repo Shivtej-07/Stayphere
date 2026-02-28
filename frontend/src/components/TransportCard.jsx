@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plane, Train, Bus, Car, ArrowRight, Clock, Wifi, Coffee, Battery } from 'lucide-react';
+import FavoriteButton from './FavoriteButton';
 
 const TransportCard = ({ transport, onBook }) => {
     const getIcon = (type) => {
@@ -9,6 +10,17 @@ const TransportCard = ({ transport, onBook }) => {
             case 'bus': return <Bus className="w-5 h-5" />;
             case 'car': return <Car className="w-5 h-5" />;
             default: return <Plane className="w-5 h-5" />;
+        }
+    };
+
+    const getTimelineIcon = (type) => {
+        const baseClass = "w-4 h-4 text-slate-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2";
+        switch (type) {
+            case 'flight': return <Plane className={`${baseClass} rotate-90`} />;
+            case 'train': return <Train className={baseClass} />;
+            case 'bus': return <Bus className={baseClass} />;
+            case 'car': return <Car className={baseClass} />;
+            default: return <Plane className={`${baseClass} rotate-90`} />;
         }
     };
 
@@ -23,15 +35,16 @@ const TransportCard = ({ transport, onBook }) => {
 
     return (
         <div className="group relative bg-slate-800 rounded-3xl overflow-hidden border border-white/5 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10">
+            <FavoriteButton itemId={transport._id} onModel="Transport" />
             <div className="flex flex-col md:flex-row">
                 {/* Left Section: Time & Route */}
                 <div className="p-6 md:p-8 flex-1 flex flex-col justify-between relative z-10">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center space-x-3">
                             <div className={`p-3 rounded-2xl ${transport.type === 'flight' ? 'bg-blue-500/20 text-blue-400' :
-                                    transport.type === 'train' ? 'bg-orange-500/20 text-orange-400' :
-                                        transport.type === 'bus' ? 'bg-green-500/20 text-green-400' :
-                                            'bg-purple-500/20 text-purple-400'
+                                transport.type === 'train' ? 'bg-orange-500/20 text-orange-400' :
+                                    transport.type === 'bus' ? 'bg-green-500/20 text-green-400' :
+                                        'bg-purple-500/20 text-purple-400'
                                 }`}>
                                 {getIcon(transport.type)}
                             </div>
@@ -63,7 +76,7 @@ const TransportCard = ({ transport, onBook }) => {
                             <div className="w-full h-[2px] bg-slate-700 relative flex items-center">
                                 <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
                                 <div className="flex-1"></div>
-                                <Plane className="w-4 h-4 text-slate-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90" />
+                                {getTimelineIcon(transport.type)}
                                 <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
                             </div>
                             <div className="text-xs text-slate-500 mt-2">Direct</div>

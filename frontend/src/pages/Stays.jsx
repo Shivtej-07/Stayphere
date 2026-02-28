@@ -3,6 +3,7 @@ import { Search, MapPin, Star, Filter, ArrowRight, Eye, Clock, Zap } from 'lucid
 import { useNavigate } from 'react-router-dom';
 import BookingModal from '../components/BookingModal';
 import { API_BASE_URL } from '../config';
+import FavoriteButton from '../components/FavoriteButton';
 
 const categories = ["All", "Beach", "Mountain", "City", "Countryside", "Luxury"];
 
@@ -230,6 +231,7 @@ const Stays = () => {
                                 className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer"
                             >
                                 <div className="relative h-60 overflow-hidden">
+                                    <FavoriteButton itemId={stay.id} onModel="Hotel" />
                                     <img
                                         src={stay.image}
                                         alt={stay.name}

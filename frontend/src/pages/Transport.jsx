@@ -14,7 +14,7 @@ const Transport = () => {
 
     // Initial fetch trigger
     useEffect(() => {
-        fetchTransports();
+        fetchTransports({ type: 'flight' });
     }, []);
 
     const fetchTransports = async (queryParams = {}) => {

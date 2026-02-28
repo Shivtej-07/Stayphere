@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, Heart } from 'lucide-react';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +57,9 @@ const Navbar = () => {
 
                     {user ? (
                         <div className="flex items-center space-x-4">
+                            <Link to="/favorites" className="text-gray-300 hover:text-white transition-colors" title="Favorites">
+                                <Heart size={20} />
+                            </Link>
                             <div className="flex items-center space-x-2">
                                 {user.avatar && user.avatar !== 'https://res.cloudinary.com/dswtemx8x/image/upload/v1/stayphere/default_avatar.png' ? (
                                     <img

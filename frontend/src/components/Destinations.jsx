@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, TrendingUp, MapPin } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import FavoriteButton from './FavoriteButton';
 
 const Destinations = () => {
     const navigate = useNavigate();
@@ -82,8 +83,8 @@ const Destinations = () => {
                                 className="group relative h-[450px] rounded-3xl overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-primary/20"
                                 onClick={() => handleCardClick(dest.id)}
                             >
-                                {/* Background Image */}
                                 <div className="absolute inset-0">
+                                    <FavoriteButton itemId={dest.id} onModel="Destination" />
                                     <img
                                         src={dest.image}
                                         alt={dest.name}
