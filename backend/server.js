@@ -27,6 +27,7 @@ app.use('/api/destinations', require('./routes/destinationRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/favorites', require('./routes/favoriteRoutes'));
+app.use('/api/stats', require('./routes/statRoutes'));
 // app.use('/api/v1/resource', require('./routes/resourceRoutes'));
 
 app.get('/', (req, res) => {

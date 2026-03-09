@@ -1,11 +1,58 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', {
         expiresIn: '30d',
     });
+};
+
+// @desc    Google Login
+// @route   POST /api/auth/google
+// @access  Public
+exports.googleLogin = async (req, res) => {
+    try {
+        const { tokenId } = req.body;
+
+        const ticket = await client.verifyIdToken({
+            idToken: tokenId,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const { email, name, picture } = ticket.getPayload();
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create user without password
+            user = await User.create({
+                username: email.split('@')[0] + Math.random().toString(36).substring(2, 6), // Generate unique username
+                email,
+                avatar: picture,
+            });
+        }
+
+        const token = generateToken(user._id);
+
+        res.status(200).json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin,
+            },
+        });
+    } catch (error) {
+        console.error('Google Auth Error:', error);
+        res.status(500).json({ success: false, message: 'Google Authentication Failed', error: error.message });
+    }
 };
 
 // @desc    Register new user

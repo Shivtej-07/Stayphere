@@ -1,8 +1,37 @@
-import React from 'react';
-import { Facebook, Twitter, Instagram, Linkedin, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Facebook, Twitter, Instagram, Linkedin, Send, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 const Footer = () => {
+    const [visitorCount, setVisitorCount] = useState(null);
+
+    useEffect(() => {
+        const fetchVisitorCount = async () => {
+            try {
+                const hasVisited = sessionStorage.getItem('hasVisited');
+
+                if (!hasVisited) {
+                    const res = await fetch(`${API_BASE_URL}/stats/visit`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        setVisitorCount(data.count);
+                        sessionStorage.setItem('hasVisited', 'true');
+                    }
+                } else {
+                    const res = await fetch(`${API_BASE_URL}/stats`);
+                    const data = await res.json();
+                    if (data.success) {
+                        setVisitorCount(data.count);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching visitor count:", error);
+            }
+        };
+
+        fetchVisitorCount();
+    }, []);
     return (
         <footer className="bg-slate-900 border-t border-white/10 pt-16 pb-8 text-sm">
             <div className="container mx-auto px-6">
@@ -64,7 +93,15 @@ const Footer = () => {
                 </div>
 
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-                    <p>&copy; {new Date().getFullYear()} Stayphere. All rights reserved.</p>
+                    <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-2 md:space-y-0">
+                        <p>&copy; {new Date().getFullYear()} Stayphere. All rights reserved.</p>
+                        {visitorCount !== null && (
+                            <div className="flex items-center space-x-1 text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
+                                <Users size={14} />
+                                <span className="font-semibold text-xs tracking-wide">{visitorCount.toLocaleString()} Visitors</span>
+                            </div>
+                        )}
+                    </div>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
                         <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
