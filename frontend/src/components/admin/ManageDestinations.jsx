@@ -39,6 +39,11 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
                 fetchDestinations();
             } catch (error) {
                 setMessage('Error deleting destination: ' + (error.response?.data?.message || error.message));
+                if (error.response?.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login';
+                }
             }
         }
     };
@@ -77,6 +82,11 @@ const ManageDestinations = ({ setMessage, refreshTrigger }) => {
             fetchDestinations();
         } catch (error) {
             setMessage('Error updating destination: ' + (error.response?.data?.message || error.message));
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
         }
     };
 
