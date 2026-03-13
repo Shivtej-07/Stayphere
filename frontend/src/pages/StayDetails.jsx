@@ -140,7 +140,7 @@ const StayDetails = () => {
     }
 
     if (!stay) {
-        return <div className="min-h-screen bg-dark pt-24 text-white text-center">Property not found</div>;
+        return <div className="min-h-screen bg-dark pt-24 text-white text-center">Stay not found</div>;
     }
 
     return (
@@ -191,7 +191,7 @@ const StayDetails = () => {
                         </div>
 
                         <p className="text-gray-300 mb-8 leading-relaxed">
-                            {stay.description || "Experience a wonderful stay at this property. Enjoy top-notch amenities and a relaxing atmosphere."}
+                            {stay.description || "Experience a wonderful time at this stay. Enjoy top-notch amenities and a relaxing atmosphere."}
                         </p>
 
                         <div className="mb-8">

@@ -63,6 +63,19 @@ const ChatAssistant = () => {
                 action: { label: "Go to Transport", path: "/transport" }
             };
         }
+        // Handle specific travel plan requests
+        if (lowerText.includes('plan') || lowerText.includes('trip') || lowerText.includes('itinerary') || lowerText.includes('travel') || lowerText.includes('vacation')) {
+            // Try to extract a destination if they used 'to [destination]'
+            const destMatch = lowerText.match(/to\s+([a-z\s]+?)(?:\s+for|\s+in|\s|$)/);
+            const destination = destMatch && destMatch[1] && destMatch[1].trim().length > 2 
+                ? destMatch[1].trim().charAt(0).toUpperCase() + destMatch[1].trim().slice(1) 
+                : "your destination";
+
+            return {
+                text: `Here is a perfect 3-day travel plan for ${destination}! 🗺️\n\nDay 1: Arrival & Local Exploration - Check into your accommodation, explore the nearby area, and enjoy a local dinner.\nDay 2: Adventure & Sightseeing - Book a tour to visit the main attractions, take plenty of photos, and experience the culture.\nDay 3: Relaxation & Departure - Enjoy a leisurely morning, pick up some souvenirs, and prepare for a safe trip back.\n\nWould you like to find a place to stay?`,
+                action: { label: "Explore Destinations", path: "/stays" }
+            };
+        }
         if (lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('hey')) {
             return { text: "Hello there! 👋 Ready to plan your next adventure?" };
         }

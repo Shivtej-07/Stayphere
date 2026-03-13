@@ -5,7 +5,7 @@ const features = [
     {
         icon: ShieldCheck,
         title: "Verified Stays",
-        description: "Every property is handpicked and verified ensuring a high standard of comfort and safety.",
+        description: "Every stay is handpicked and verified ensuring a high standard of comfort and safety.",
         color: "text-emerald-400",
         bg: "bg-emerald-400/10"
     },

@@ -175,13 +175,13 @@ const Stays = () => {
                                 <span className="text-green-400 text-xs font-bold uppercase tracking-widest">Live Availability</span>
                             </div>
                             <h1 className="text-3xl font-bold text-white mb-2">Find Your Perfect Stay</h1>
-                            <p className="text-gray-400">Browse through our handpicked collection of properties.</p>
+                            <p className="text-gray-400">Browse through our handpicked collection of stays.</p>
                         </div>
 
                         <div className="relative w-full md:w-96">
                             <input
                                 type="text"
-                                placeholder="Search location or property..."
+                                placeholder="Search location or stay..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition-colors"
@@ -303,13 +303,13 @@ const Stays = () => {
                             <div className="bg-white/5 inline-flex p-4 rounded-full mb-4">
                                 <Filter size={24} className="text-gray-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">No properties found</h3>
+                            <h3 className="text-xl font-bold text-white mb-2">No stays found</h3>
                             <p className="text-gray-400">Try adjusting your filters or search criteria.</p>
                             <button
                                 onClick={() => setActiveCategory("All")}
                                 className="mt-4 text-primary hover:underline"
                             >
-                                View all properties
+                                View all stays
                             </button>
                         </div>
                     )}

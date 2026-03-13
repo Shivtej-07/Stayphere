@@ -7,7 +7,7 @@ const LiveNotifications = () => {
 
     const names = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "James", "Anna"];
     const locations = ["USA", "UK", "Canada", "Germany", "France", "Australia", "Japan"];
-    const actions = ["just booked a stay in", "is viewing a property in", "left a 5-star review for"];
+    const actions = ["just booked a stay in", "is viewing a stay in", "left a 5-star review for"];
     const places = ["Bali", "Maldives", "Swiss Alps", "New York", "Santorini", "Paris", "Tokyo"];
 
     useEffect(() => {

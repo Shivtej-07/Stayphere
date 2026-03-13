@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, ArrowRight, Github, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
 import { GoogleLogin } from '@react-oauth/google';
@@ -266,8 +266,8 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition-colors overflow-hidden">
+                    <div className="flex justify-center gap-4">
+                        <div className="w-full flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition-colors overflow-hidden">
                             <div className="w-full flex justify-center [&>div]:!w-full [&>div>div]:!w-full [&_iframe]:!w-full">
                                 <GoogleLogin
                                     onSuccess={handleGoogleLogin}
@@ -280,10 +280,6 @@ const Login = () => {
                                 />
                             </div>
                         </div>
-                        <button className="flex items-center justify-center space-x-2 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-colors">
-                            <Github size={18} />
-                            <span className="text-sm">GitHub</span>
-                        </button>
                     </div>
 
                     <div className="mt-8 text-center">
