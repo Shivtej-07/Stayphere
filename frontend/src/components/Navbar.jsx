@@ -51,6 +51,7 @@ const Navbar = () => {
                     <Link to="/stays" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Stays</Link>
                     <Link to="/transport" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Transport</Link>
                     <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">About</Link>
+                    <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Contact</Link>
                     {user && user.isAdmin && (
                         <Link to="/admin" className="text-primary hover:text-primary/80 transition-colors text-sm font-medium">Dashboard</Link>
                     )}
@@ -60,31 +61,38 @@ const Navbar = () => {
                             <Link to="/favorites" className="text-gray-300 hover:text-white transition-colors" title="Favorites">
                                 <Heart size={20} />
                             </Link>
-                            <div className="flex items-center space-x-2">
-                                {user.avatar && user.avatar !== 'https://res.cloudinary.com/dswtemx8x/image/upload/v1/stayphere/default_avatar.png' ? (
-                                    <img
-                                        src={user.avatar}
-                                        alt={user.username}
-                                        className="w-8 h-8 rounded-full object-cover border border-white/10"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'flex';
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-white/10">
-                                        <User size={16} className="text-primary" />
-                                    </div>
-                                )}
-                                <span className="text-white text-sm font-medium">{user.username || user.name}</span>
+                            <div className="flex items-center space-x-2 group relative">
+                                <div className="flex items-center space-x-2 cursor-pointer">
+                                    {user.avatar && user.avatar !== 'https://res.cloudinary.com/dswtemx8x/image/upload/v1/stayphere/default_avatar.png' ? (
+                                        <img
+                                            src={user.avatar}
+                                            alt={user.username}
+                                            className="w-8 h-8 rounded-full object-cover border border-white/10"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-white/10">
+                                            <User size={16} className="text-primary" />
+                                        </div>
+                                    )}
+                                    <span className="text-white text-sm font-medium">{user.username || user.name}</span>
+                                </div>
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-dark border border-white/10 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                                        Profile
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors flex items-center"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
                             </div>
-                            <button
-                                onClick={handleLogout}
-                                className="flex items-center space-x-2 bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-full transition-all text-sm font-medium text-red-400 border border-red-500/10"
-                            >
-                                <span>Logout</span>
-                            </button>
                         </div>
                     ) : (
                         <Link to="/login" className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-all text-sm font-medium text-white border border-white/10">
@@ -110,6 +118,7 @@ const Navbar = () => {
                         <Link to="/stays" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block">Stays</Link>
                         <Link to="/transport" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block">Transport</Link>
                         <Link to="/about" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block">About</Link>
+                        <Link to="/contact" onClick={() => setIsOpen(false)} className="text-gray-300 hover:text-white block">Contact</Link>
                         {user && user.isAdmin && (
                             <Link to="/admin" onClick={() => setIsOpen(false)} className="text-primary hover:text-primary/80 block">Dashboard</Link>
                         )}
@@ -128,7 +137,10 @@ const Navbar = () => {
                                         <span className="text-gray-400 text-xs">{user.email}</span>
                                     </div>
                                 </div>
-                                <button onClick={() => { handleLogout(); setIsOpen(false); }} className="w-full text-left text-red-400 py-2 hover:bg-white/5 rounded-lg px-2 transition-colors">
+                                <Link to="/profile" onClick={() => setIsOpen(false)} className="w-full text-left text-gray-300 py-2 hover:bg-white/5 rounded-lg px-2 transition-colors block">
+                                    Profile
+                                </Link>
+                                <button onClick={() => { handleLogout(); setIsOpen(false); }} className="w-full text-left text-red-400 py-2 hover:bg-white/5 rounded-lg px-2 transition-colors mt-1">
                                     Logout
                                 </button>
                             </div>

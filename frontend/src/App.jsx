@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Stays from './pages/Stays';
 import Login from './pages/Login';
 import MyBookings from './pages/MyBookings';
+import Profile from './pages/Profile';
 import ChatAssistant from './components/ChatAssistant';
 import LiveNotifications from './components/LiveNotifications';
 
@@ -14,6 +15,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import StayDetails from './pages/StayDetails';
 import DestinationDetails from './pages/DestinationDetails';
 import Favorites from './pages/Favorites';
+import About from './pages/About';
+import ContactUs from './pages/ContactUs';
 
 import ConnectionErrorBanner from './components/ConnectionErrorBanner';
 
@@ -41,9 +44,11 @@ function App() {
           <Route path="/stays/:id" element={<Layout><StayDetails /></Layout>} />
           <Route path="/destinations/:id" element={<Layout><DestinationDetails /></Layout>} />
           <Route path="/transport" element={<Layout><Transport /></Layout>} />
-          <Route path="/about" element={<Layout><div className="pt-24 text-center">About Page (Coming Soon)</div></Layout>} />
+          <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/contact" element={<Layout><ContactUs /></Layout>} />
           <Route path="/login" element={<Layout><Login /></Layout>} />
           <Route path="/my-bookings" element={<Layout><MyBookings /></Layout>} />
+          <Route path="/profile" element={<Layout><Profile /></Layout>} />
           <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
 
           {/* Admin Route without Navbar */}

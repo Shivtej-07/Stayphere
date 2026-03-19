@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, ArrowLeft, Calendar, Users, Star, Share2, Heart, Grid, X } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import BookingModal from '../components/BookingModal'; // Assuming BookingModal is in components
+import WeatherWidget from '../components/WeatherWidget';
 
 const DestinationDetails = () => {
     const { id } = useParams();
@@ -199,6 +200,25 @@ const DestinationDetails = () => {
                                 </div>
                             )}
                         </section>
+
+                        {/* Location Map Section */}
+                        <section>
+                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                                <MapPin size={24} className="text-primary" />
+                                Location
+                            </h2>
+                            <div className="w-full h-[350px] rounded-2xl overflow-hidden border border-white/10 relative shadow-2xl">
+                                <iframe
+                                    title={`Map of ${destination.locationName}`}
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.1) brightness(0.9)' }} // Dark mode styling
+                                    loading="lazy"
+                                    allowFullScreen
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(destination.locationName + ', ' + destination.country)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                                ></iframe>
+                            </div>
+                        </section>
                     </div>
 
                     {/* Sidebar */}
@@ -229,6 +249,8 @@ const DestinationDetails = () => {
                                     Fast & Secure booking powered by Stripe & UPI
                                 </p>
                             </div>
+
+                            <WeatherWidget location={destination.locationName} />
 
                             <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
                                 <h3 className="font-bold mb-4">Why Book With Us?</h3>

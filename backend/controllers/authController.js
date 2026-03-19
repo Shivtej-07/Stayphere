@@ -96,7 +96,7 @@ exports.register = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error(error);
+        console.error('Register Error:', error);
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
     }
 };
@@ -173,5 +173,88 @@ exports.deleteUser = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+// @desc    Get logged in user profile
+// @route   GET /api/auth/me
+// @access  Private
+exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                avatar: user.avatar,
+                isAdmin: user.isAdmin,
+                createdAt: user.createdAt,
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+    try {
+        console.log("UPDATE PROFILE CALLED. Body:", req.body, "File:", req.file);
+        console.log("Req.user:", req.user);
+        
+        const user = await User.findById(req.user._id);
+
+        console.log("Found user:", user !== null);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        console.log("Updating fields...");
+        // Handle simple fields
+        user.username = (req.body && req.body.username) ? req.body.username : user.username;
+        user.email = (req.body && req.body.email) ? req.body.email : user.email;
+
+        // Optionally handle password update if provided
+        if (req.body && req.body.password) {
+            user.password = req.body.password;
+        }
+
+        console.log("Updating avatar...");
+        // Handle Avatar Upload
+        if (req.file) {
+             user.avatar = req.file.path; // Cloudinary URL
+        } else if (req.body && req.body.avatarUrl) {
+             user.avatar = req.body.avatarUrl;
+        }
+
+        console.log("Saving user:", user.username);
+        const updatedUser = await user.save();
+        
+        console.log("User saved, returning response:", updatedUser.username);
+        res.status(200).json({
+            success: true,
+            user: {
+                id: updatedUser._id,
+                username: updatedUser.username,
+                email: updatedUser.email,
+                avatar: updatedUser.avatar,
+                isAdmin: updatedUser.isAdmin,
+                createdAt: updatedUser.createdAt
+            },
+        });
+    } catch (error) {
+        console.error('Update Profile Error Stack:', error.stack);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message || error });
     }
 };
