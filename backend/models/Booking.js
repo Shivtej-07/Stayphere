@@ -33,6 +33,14 @@ const BookingSchema = new mongoose.Schema(
             required: true,
             default: 1
         },
+        travelingFrom: {
+            type: String,
+            default: 'Not specified',
+        },
+        transportType: {
+            type: String,
+            default: 'None',
+        },
         price: {
             type: Number, // Total price paid
             required: true,

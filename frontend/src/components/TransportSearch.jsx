@@ -92,6 +92,7 @@ const TransportSearch = ({ onSearch, availableLocations }) => {
                             type="date"
                             name="date"
                             value={searchParams.date}
+                            min={new Date().toISOString().split('T')[0]}
                             onChange={handleChange}
                             className="w-full h-14 pl-12 pr-4 bg-dark/50 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:bg-dark/80 transition-all"
                             style={{ colorScheme: 'dark' }}

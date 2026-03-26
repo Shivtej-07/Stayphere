@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2 } from 'lucide-react';
+import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2, MapPin, Plane, Train, Bus, Car, Ship } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './CheckoutForm';
@@ -11,6 +11,8 @@ const BookingModal = ({ isOpen, onClose, property }) => {
     const [step, setStep] = useState(1);
     const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
+    const [travelingFrom, setTravelingFrom] = useState('');
+    const [transportType, setTransportType] = useState('Flight');
     const [paymentMethod, setPaymentMethod] = useState(null); // 'card', 'gpay', 'phonepe', 'paytm', 'qr'
     const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle', 'processing', 'success'
     const [clientSecret, setClientSecret] = useState("");
@@ -21,6 +23,39 @@ const BookingModal = ({ isOpen, onClose, property }) => {
         const priceStr = String(price);
         return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
     };
+
+    // Calculate dynamic transport options
+    const availableTransports = React.useMemo(() => {
+        if (!property?.location) return ['Flight', 'Train', 'Bus', 'Cab', 'Local'];
+        const loc = property.location.toLowerCase();
+        
+        // Let's assume domestic involves India since user is from Pune
+        const isDomestic = loc.includes('india') || loc.includes('mumbai') || loc.includes('delhi');
+        
+        // Places that require or support shipping/sea paths
+        const isSeaAccessible = loc.includes('bali') || loc.includes('maldives') || loc.includes('island') || loc.includes('sea') || loc.includes('ocean');
+
+        if (!isDomestic) {
+            // Out of country
+            if (isSeaAccessible) {
+                return ['Flight', 'Ship'];
+            }
+            return ['Flight']; // Only planes for landlocked out-country places like Swiss Alps
+        }
+
+        // Domestic options
+        if (isSeaAccessible) {
+            return ['Flight', 'Train', 'Bus', 'Cab', 'Ship', 'Local'];
+        }
+        return ['Flight', 'Train', 'Bus', 'Cab', 'Local'];
+    }, [property]);
+
+    // Ensure selected transport is valid
+    useEffect(() => {
+        if (availableTransports.length > 0 && !availableTransports.includes(transportType)) {
+            setTransportType(availableTransports[0]);
+        }
+    }, [availableTransports, transportType]);
 
     // Fetch Client Secret when entering payment step
     useEffect(() => {
@@ -71,6 +106,8 @@ const BookingModal = ({ isOpen, onClose, property }) => {
                 checkIn: dates.checkIn,
                 checkOut: dates.checkOut,
                 guests: guests,
+                travelingFrom: travelingFrom,
+                transportType: transportType,
                 price: getPriceAmount(property.price),
                 paymentId: paymentId
             };
@@ -237,6 +274,7 @@ const BookingModal = ({ isOpen, onClose, property }) => {
                                         <input
                                             type="date"
                                             required
+                                            min={new Date().toISOString().split('T')[0]}
                                             className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
                                             onChange={(e) => setDates({ ...dates, checkIn: e.target.value })}
                                         />
@@ -249,6 +287,7 @@ const BookingModal = ({ isOpen, onClose, property }) => {
                                         <input
                                             type="date"
                                             required
+                                            min={dates.checkIn || new Date().toISOString().split('T')[0]}
                                             className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
                                             onChange={(e) => setDates({ ...dates, checkOut: e.target.value })}
                                         />
@@ -269,6 +308,68 @@ const BookingModal = ({ isOpen, onClose, property }) => {
                                             <option key={num} value={num} className="bg-dark text-white">{num} Guests</option>
                                         ))}
                                     </select>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-2">
+                                <h5 className="text-sm font-bold text-white mb-3">Route & Transport Medium</h5>
+                                <div className="flex items-center justify-between gap-2 mb-4">
+                                    <div className="flex-1">
+                                        <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 focus-within:border-primary transition-colors">
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="e.g., Pune"
+                                                className="w-full bg-transparent text-white text-xs focus:outline-none text-center"
+                                                value={travelingFrom}
+                                                onChange={(e) => setTravelingFrom(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col items-center justify-center px-1">
+                                        {transportType === 'Flight' ? <Plane size={16} className="text-primary mb-1" /> :
+                                         transportType === 'Train' ? <Train size={16} className="text-primary mb-1" /> :
+                                         transportType === 'Bus' ? <Bus size={16} className="text-primary mb-1" /> :
+                                         transportType === 'Cab' ? <Car size={16} className="text-primary mb-1" /> :
+                                         transportType === 'Ship' ? <Ship size={16} className="text-primary mb-1" /> :
+                                         <MapPin size={16} className="text-primary mb-1" />}
+                                        <div className="w-8 border-t border-dashed border-gray-500"></div>
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 opacity-70">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                className="w-full bg-transparent text-white text-xs focus:outline-none text-center"
+                                                value={property.location ? property.location.split(',')[0] : "Destination"}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-gray-400 ml-1">Transport Medium</label>
+                                    <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 focus-within:border-primary transition-colors">
+                                        {transportType === 'Flight' ? <Plane size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
+                                         transportType === 'Train' ? <Train size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
+                                         transportType === 'Bus' ? <Bus size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
+                                         transportType === 'Cab' ? <Car size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
+                                         transportType === 'Ship' ? <Ship size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
+                                         <MapPin size={14} className="absolute left-3 top-3.5 text-gray-400" />}
+                                        <select
+                                            className="w-full bg-transparent text-white text-xs pl-8 focus:outline-none appearance-none"
+                                            value={transportType}
+                                            onChange={(e) => setTransportType(e.target.value)}
+                                        >
+                                            {availableTransports.map(mode => (
+                                                <option key={mode} value={mode} className="bg-dark text-white">
+                                                    {mode}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 

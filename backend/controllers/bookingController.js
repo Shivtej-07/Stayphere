@@ -12,6 +12,8 @@ exports.createBooking = async (req, res) => {
             checkIn,
             checkOut,
             guests,
+            travelingFrom,
+            transportType,
             price,
             paymentId
         } = req.body;
@@ -24,6 +26,8 @@ exports.createBooking = async (req, res) => {
             checkIn,
             checkOut,
             guests,
+            travelingFrom,
+            transportType,
             price,
             paymentId
         });

@@ -88,9 +88,16 @@ const MyBookings = () => {
                                                 <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{booking.hotelName}</h3>
                                                 <span className="text-xl font-bold text-white">{booking.price}</span>
                                             </div>
-                                            <div className="flex items-center text-gray-400 text-sm mb-4">
-                                                <MapPin size={14} className="mr-1" />
-                                                {booking.location}
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center text-gray-400 text-sm">
+                                                    <MapPin size={14} className="mr-1" />
+                                                    {booking.location}
+                                                </div>
+                                                {(booking.travelingFrom && booking.travelingFrom !== 'Not specified') && (
+                                                    <div className="text-xs px-2 py-1 bg-white/5 rounded-md text-gray-400 border border-white/10">
+                                                        From <strong>{booking.travelingFrom}</strong> via {booking.transportType || 'None'}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4 mb-4">
