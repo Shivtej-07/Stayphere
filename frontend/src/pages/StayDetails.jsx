@@ -4,6 +4,7 @@ import { MapPin, Star, ArrowLeft, Wifi, Coffee, Car, Utensils, Camera, Map as Ma
 import MapComponent from '../components/MapComponent';
 import BookingModal from '../components/BookingModal';
 import { API_BASE_URL } from '../config';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const StayDetails = () => {
     const { id } = useParams();
@@ -21,7 +22,7 @@ const StayDetails = () => {
             name: "The Royal Paradise",
             city: "Bali, Indonesia",
             location: "Bali, Indonesia", // Ensure compatibility
-            price: "$120",
+            price: formatPriceForCountry(10000, "Indonesia"),
             rating: 4.8,
             category: "Beach",
             image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
@@ -34,7 +35,7 @@ const StayDetails = () => {
             name: "Ocean View Resort",
             city: "Maldives",
             location: "Maldives",
-            price: "$250",
+            price: formatPriceForCountry(21000, "Maldives"),
             rating: 4.9,
             category: "Beach",
             image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
@@ -47,7 +48,7 @@ const StayDetails = () => {
             name: "Mountain Retreat",
             city: "Swiss Alps",
             location: "Swiss Alps",
-            price: "$180",
+            price: formatPriceForCountry(15000, "Switzerland"),
             rating: 4.7,
             category: "Mountain",
             image: "https://images.unsplash.com/photo-1519659528534-7fd733a832a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -97,6 +98,7 @@ const StayDetails = () => {
                                 ...apiStay,
                                 id: apiStay._id,
                                 location: apiStay.city || apiStay.address, // Ensure location string
+                                price: formatPriceForCountry(apiStay.price || (Math.floor(Math.random() * 5000) + 3000), apiStay.city || apiStay.address),
                                 image: hasValidPhoto ? apiStay.photos[0] : getFallbackImage(apiStay._id),
                                 amenities: ["Free Wifi", "Breakfast Included", "Pool", "Gym"], // Default amenities if missing
                                 coordinates: apiStay.location && apiStay.location.coordinates
@@ -266,6 +268,7 @@ const StayDetails = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 property={stay}
+                type="hotel"
             />
         </div>
     );

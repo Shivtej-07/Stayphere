@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plane, Train, Bus, Car, ArrowRight, Clock, Wifi, Coffee, Battery } from 'lucide-react';
 import FavoriteButton from './FavoriteButton';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const TransportCard = ({ transport, onBook }) => {
     const getIcon = (type) => {
@@ -113,7 +114,7 @@ const TransportCard = ({ transport, onBook }) => {
                 {/* Right Section: Price & Action */}
                 <div className="bg-slate-800/50 p-6 md:w-48 flex flex-col justify-center items-center md:items-end border-t md:border-t-0 border-white/5 relative z-10">
                     <div className="text-slate-400 text-sm mb-1">Price per person</div>
-                    <div className="text-3xl font-bold text-white mb-4">${transport.price}</div>
+                    <div className="text-3xl font-bold text-white mb-4">{formatPriceForCountry(transport.price, transport.to.includes(',') ? transport.to.split(',')[1].trim() : transport.to)}</div>
 
                     <button
                         onClick={() => onBook(transport)}

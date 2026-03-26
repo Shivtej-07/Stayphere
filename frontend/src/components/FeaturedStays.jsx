@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Star, MapPin, ArrowRight } from 'lucide-react';
 import BookingModal from './BookingModal';
 import { API_BASE_URL } from '../config';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const TiltCard = ({ children, onClick }) => {
     const cardRef = useRef(null);
@@ -75,6 +76,7 @@ const FeaturedStays = () => {
                         ...stay,
                         id: stay._id,
                         image: hasValidPhoto ? stay.photos[0] : "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+                        price: formatPriceForCountry(stay.price || (Math.floor(Math.random() * 5000) + 3000), stay.city || stay.address),
                         rating: stay.rating || 4.8 // Fallback rating if not in DB
                     };
                 });
@@ -172,6 +174,7 @@ const FeaturedStays = () => {
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     property={selectedStay}
+                    type="hotel"
                 />
             )}
         </>

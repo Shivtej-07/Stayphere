@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import BookingModal from '../components/BookingModal';
 import { API_BASE_URL } from '../config';
 import FavoriteButton from '../components/FavoriteButton';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const categories = ["All", "Beach", "Mountain", "City", "Countryside", "Luxury"];
 
@@ -27,7 +28,7 @@ const Stays = () => {
             id: "mock-1",
             name: "The Royal Paradise",
             city: "Bali, Indonesia",
-            price: "$120",
+            price: formatPriceForCountry(10000, "Indonesia"),
             rating: 4.8,
             category: "Beach",
             image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
@@ -39,7 +40,7 @@ const Stays = () => {
             id: "mock-2",
             name: "Ocean View Resort",
             city: "Maldives",
-            price: "$250",
+            price: formatPriceForCountry(21000, "Maldives"),
             rating: 4.9,
             category: "Beach",
             image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
@@ -51,7 +52,7 @@ const Stays = () => {
             id: "mock-3",
             name: "Mountain Retreat",
             city: "Swiss Alps",
-            price: "$180",
+            price: formatPriceForCountry(15000, "Switzerland"),
             rating: 4.7,
             category: "Mountain",
             image: "https://images.unsplash.com/photo-1519659528534-7fd733a832a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -94,6 +95,7 @@ const Stays = () => {
                         ...stay,
                         id: stay._id, // Ensure ID compatibility
                         image: hasValidPhoto ? stay.photos[0] : getFallbackImage(stay._id),
+                        price: formatPriceForCountry(stay.price || (Math.floor(Math.random() * 5000) + 3000), stay.city || stay.address),
                         viewers: Math.floor(Math.random() * 20) + 5,
                         roomsLeft: Math.floor(Math.random() * 5) + 1,
                         isHot: Math.random() > 0.7
@@ -321,6 +323,7 @@ const Stays = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 property={selectedStay}
+                type="hotel"
             />
         </>
     );

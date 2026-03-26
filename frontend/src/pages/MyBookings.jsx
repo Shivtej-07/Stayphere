@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Search, ArrowRight, Home, CreditCard } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const MyBookings = () => {
     const [bookings, setBookings] = useState([]);
@@ -86,7 +87,9 @@ const MyBookings = () => {
                                         <div>
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{booking.hotelName}</h3>
-                                                <span className="text-xl font-bold text-white">{booking.price}</span>
+                                                <span className="text-xl font-bold text-white">
+                                                    {formatPriceForCountry(booking.price, booking.location ? (booking.location.includes(',') ? booking.location.split(',')[1].trim() : booking.location) : 'India')}
+                                                </span>
                                             </div>
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex items-center text-gray-400 text-sm">

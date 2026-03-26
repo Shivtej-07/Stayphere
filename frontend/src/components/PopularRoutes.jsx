@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const popularRoutes = [
     { from: 'New Delhi', to: 'Dehradun', price: 3500, image: 'https://images.unsplash.com/photo-1626079979737-23055480746e?auto=format&fit=crop&w=400&q=80' },
@@ -28,7 +29,7 @@ const PopularRoutes = ({ onSelectRoute }) => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                         <div className="absolute bottom-4 left-4 text-white">
-                            <div className="text-sm font-medium text-gray-300 mb-1">Starting from <span className="text-white font-bold text-lg">${route.price}</span></div>
+                            <div className="text-sm font-medium text-gray-300 mb-1">Starting from <span className="text-white font-bold text-lg">{formatPriceForCountry(route.price, route.to.includes(',') ? route.to.split(',')[1].trim() : route.to)}</span></div>
                             <div className="flex items-center space-x-2 font-bold text-lg">
                                 <span>{route.from}</span>
                                 <ArrowRight size={16} className="text-primary" />
