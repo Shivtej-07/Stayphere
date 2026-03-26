@@ -4,6 +4,7 @@ import { MapPin, ArrowLeft, Calendar, Users, Star, Share2, Heart, Grid, X } from
 import { API_BASE_URL } from '../config';
 import BookingModal from '../components/BookingModal'; // Assuming BookingModal is in components
 import WeatherWidget from '../components/WeatherWidget';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const DestinationDetails = () => {
     const { id } = useParams();
@@ -23,14 +24,16 @@ const DestinationDetails = () => {
                 }
                 const data = await response.json();
 
+                const countryName = data.name.includes(',') ? data.name.split(',')[1].trim() : "India";
+
                 // Enhance data with mock pricing/viewers if not present, similar to Destinations.jsx
                 const enhancedData = {
                     ...data,
-                    price: data.price || `₹${Math.floor(Math.random() * 5000) + 3000}`,
+                    locationName: data.name.includes(',') ? data.name.split(',')[0].trim() : data.name,
+                    country: countryName,
+                    price: data.price ? formatPriceForCountry(data.price, countryName) : formatPriceForCountry(Math.floor(Math.random() * 5000) + 3000, countryName),
                     rating: (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1),
                     reviews: Math.floor(Math.random() * 500) + 50,
-                    locationName: data.name.includes(',') ? data.name.split(',')[0].trim() : data.name,
-                    country: data.name.includes(',') ? data.name.split(',')[1].trim() : "India",
                 };
 
                 setDestination(enhancedData);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, TrendingUp, MapPin } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import FavoriteButton from './FavoriteButton';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const Destinations = () => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Destinations = () => {
                     location: dest.name.includes(',') ? dest.name.split(',')[0].trim() : dest.name,
                     country: dest.name.includes(',') ? dest.name.split(',')[1].trim() : "India",
                     image: dest.photos && dest.photos.length > 0 && dest.photos[0] ? dest.photos[0] : "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=800&q=80",
-                    price: `₹${Math.floor(Math.random() * 5000) + 3000}`, // Mock starting price for booking
+                    price: formatPriceForCountry(Math.floor(Math.random() * 5000) + 3000, dest.name.includes(',') ? dest.name.split(',')[1].trim() : "India"), // Dynamic country currency
                     viewers: Math.floor(Math.random() * 50) + 10,
                 }));
                 // Ensure we have at least 4 items for the grid by duplicating if needed (for demo)
