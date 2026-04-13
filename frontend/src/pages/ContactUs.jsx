@@ -68,7 +68,7 @@ const ContactUs = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-white mb-1">Our Location</h4>
-                      <p className="text-slate-400 text-sm">123 Stayphere Blvd<br/>Tech District, NY 10001<br/>United States</p>
+                      <p className="text-slate-400 text-sm">123 Dharam Yatra Blvd<br/>Tech District, NY 10001<br/>United States</p>
                     </div>
                   </div>
                   
@@ -88,7 +88,7 @@ const ContactUs = () => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-white mb-1">Email Address</h4>
-                      <p className="text-slate-400 text-sm">support@stayphere.com<br/>info@stayphere.com</p>
+                      <p className="text-slate-400 text-sm">support@dharmayatra.com<br/>info@dharmayatra.com</p>
                     </div>
                   </div>
                 </div>

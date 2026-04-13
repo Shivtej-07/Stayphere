@@ -62,19 +62,51 @@ const Stays = () => {
         }
     ];
 
-    const fallbackImages = [
-        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1466854076813-4aa9ac0fc347?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1613395877344-13d4c79e4284?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    ];
+    const getFallbackImage = (id, category) => {
+        const beachImgs = [
+            "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80",
+        ];
+        const mountainImgs = [
+            "https://images.unsplash.com/photo-1519659528534-7fd733a832a0?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1506905925224-b1580ee41870?auto=format&fit=crop&w=800&q=80",
+        ];
+        const cityImgs = [
+            "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=800&q=80",
+        ];
+        const luxuryImgs = [
+            "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
+        ];
+        const countrysideImgs = [
+            "https://images.unsplash.com/photo-1504280390467-33eb8d5e1ef2?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1473685514032-4e08253a55ac?auto=format&fit=crop&w=800&q=80",
+        ];
+        const generalImgs = [
+            "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
+            "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80"
+        ];
 
-    const getFallbackImage = (id) => {
-        if (!id) return fallbackImages[0];
-        const charCode = id.toString().charCodeAt(id.toString().length - 1);
-        return fallbackImages[charCode % fallbackImages.length];
+        let imgList = generalImgs;
+        if (category === 'Beach') imgList = beachImgs;
+        else if (category === 'Mountain') imgList = mountainImgs;
+        else if (category === 'City') imgList = cityImgs;
+        else if (category === 'Luxury') imgList = luxuryImgs;
+        else if (category === 'Countryside') imgList = countrysideImgs;
+
+        const charCode = id ? id.toString().charCodeAt(id.toString().length - 1) : 0;
+        return imgList[charCode % imgList.length];
+    };
+
+    const getCategoryAnimation = (category) => {
+        switch(category) {
+            case 'Beach': return 'animate-hover-wave transition-all duration-500';
+            case 'City': return 'animate-hover-pulse-fast transition-all duration-300';
+            case 'Luxury': return 'animate-hover-glow transition-all duration-700';
+            case 'Mountain': return 'animate-hover-float transition-all duration-700';
+            default: return 'group-hover:scale-110 transition-transform duration-500';
+        }
     };
 
     // Fetch stays from API
@@ -91,10 +123,12 @@ const Stays = () => {
                         !stay.photos[0].includes('share.google') &&
                         (stay.photos[0].startsWith('http') || stay.photos[0].startsWith('/'));
 
+                    const randomCategory = stay.category || categories[Math.floor(Math.random() * (categories.length - 1)) + 1]; // Skip 'All'
                     return {
                         ...stay,
                         id: stay._id, // Ensure ID compatibility
-                        image: hasValidPhoto ? stay.photos[0] : getFallbackImage(stay._id),
+                        category: randomCategory,
+                        image: hasValidPhoto ? stay.photos[0] : getFallbackImage(stay._id, randomCategory),
                         price: formatPriceForCountry(stay.price || (Math.floor(Math.random() * 5000) + 3000), stay.city || stay.address),
                         viewers: Math.floor(Math.random() * 20) + 5,
                         roomsLeft: Math.floor(Math.random() * 5) + 1,
@@ -239,9 +273,9 @@ const Stays = () => {
                                         alt={stay.name}
                                         onError={(e) => {
                                             e.target.onerror = null;
-                                            e.target.src = getFallbackImage(stay.id);
+                                            e.target.src = getFallbackImage(stay.id, stay.category);
                                         }}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className={`w-full h-full object-cover origin-center ${getCategoryAnimation(stay.category)}`}
                                     />
                                     <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center space-x-1 border border-white/10">
                                         <Star size={12} className="text-yellow-400 fill-yellow-400" />

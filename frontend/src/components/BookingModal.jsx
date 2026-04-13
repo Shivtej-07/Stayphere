@@ -145,7 +145,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         // REAL UPI CONFIGURATION
         // REPLACE 'merchant@upi' WITH YOUR ACTUAL VPA
         const vpa = 'merchant@upi';
-        const payeeName = 'Stayphere';
+        const payeeName = 'Dharam Yatra';
         const amount = getPriceAmount(property.price);
         const transactionRef = 'TRX' + Date.now();
 
@@ -179,7 +179,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
 
         const amount = getPriceAmount(property.price);
         const vpa = 'merchant@upi';
-        const upiUrl = `upi://pay?pa=${vpa}&pn=Stayphere&am=${amount}&cu=INR`;
+        const upiUrl = `upi://pay?pa=${vpa}&pn=Dharam Yatra&am=${amount}&cu=INR`;
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
 
         return (
@@ -220,57 +220,114 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 lg:p-8">
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
                 onClick={onClose}
             ></div>
 
-            <div className="relative bg-[#121212] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-scale h-[600px] flex flex-col">
-                {/* Processing Overlay for UPI/QR */}
-                {paymentStatus !== 'idle' && paymentMethod !== 'card' && step < 3 && renderProcessingScreen()}
-
-                <div className="p-6 pb-0 flex items-center justify-between">
-                    {step > 1 && step < 3 && (
-                        <button onClick={() => setStep(step - 1)} className="text-gray-400 hover:text-white">
-                            <span className="text-2xl">←</span>
-                        </button>
-                    )}
-                    <h3 className="text-lg font-bold text-white flex-1 text-center -ml-6">
-                        {step === 1 ? 'Booking Details' : step === 2 ? 'Select Payment' : 'Confirmation'}
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-white transition-colors z-10"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-
-                {/* Progress Bar */}
-                {step < 3 && (
-                    <div className="px-6 mt-4">
-                        <div className="flex items-center space-x-2">
-                            <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-primary' : 'bg-white/10'}`}></div>
-                            <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-primary' : 'bg-white/10'}`}></div>
-                            <div className={`h-1 flex-1 rounded-full ${step >= 3 ? 'bg-primary' : 'bg-white/10'}`}></div>
+            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden animate-fade-in-scale h-[600px] flex flex-col md:flex-row shadow-[0_0_50px_rgba(99,102,241,0.15)] glow-border">
+                
+                {/* Left Side: Dynamic Animated Image Panel */}
+                <div className="hidden md:block md:w-1/2 relative bg-dark overflow-hidden group">
+                    <img 
+                        src={property.image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000"} 
+                        alt={property.name}
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#0a0a0a]/90"></div>
+                    
+                    {/* Animated Overlay Details */}
+                    <div className="absolute bottom-0 left-0 p-8 w-full animate-slide-in-right" style={{animationDelay: '0.1s'}}>
+                        {type === 'hotel' ? (
+                            <div className="inline-flex items-center space-x-2 bg-primary/20 backdrop-blur-md px-3 py-1.5 rounded-full text-primary border border-primary/30 mb-4 animate-pulse">
+                                <MapPin size={14} />
+                                <span className="text-xs font-bold uppercase tracking-wider">{property.city || property.location || 'Destination'}</span>
+                            </div>
+                        ) : null}
+                        
+                        <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
+                            {property.name}
+                        </h2>
+                        <div className="flex items-center gap-2 mb-4 text-gray-300 text-sm">
+                             {property.rating && (
+                                <div className="flex items-center text-yellow-400 font-medium">
+                                    ★ {property.rating}
+                                </div>
+                             )}
+                             {property.rating && <span>•</span>}
+                             <span>Premium Stay</span>
+                        </div>
+                        
+                        <div className="flex items-baseline space-x-2">
+                            <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                                {property.price}
+                            </span>
+                            <span className="text-gray-400 font-medium tracking-wide">/ night</span>
                         </div>
                     </div>
-                )}
+                </div>
 
-                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-                    {step === 1 && (
-                        <form onSubmit={handleDetailsSubmit} className="space-y-5">
-                            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                                <h4 className="text-white font-medium mb-1">{property.name}</h4>
-                                <p className="text-primary text-sm font-bold">{property.price} <span className="text-gray-400 font-normal">/ night</span></p>
+                {/* Right Side: Interactive Booking Form */}
+                <div className="w-full md:w-1/2 relative flex flex-col bg-[#121212] z-10 before:content-[''] before:absolute before:-left-[1px] before:top-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+                    {/* Processing Overlay for UPI/QR */}
+                    {paymentStatus !== 'idle' && paymentMethod !== 'card' && step < 3 && renderProcessingScreen()}
+
+                    <div className="p-6 pb-2 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+                        {step > 1 && step < 3 ? (
+                            <button onClick={() => setStep(step - 1)} className="text-gray-400 hover:text-white group flex items-center gap-2 transition-colors">
+                                <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+                                <span className="text-sm font-medium">Back</span>
+                            </button>
+                        ) : (
+                            <div className="w-16"></div> /* Spacer */
+                        )}
+                        <h3 className="text-lg font-bold text-white text-center flex-1">
+                            {step === 1 ? 'Configure Stay' : step === 2 ? 'Secure Payment' : 'Confirmed'}
+                        </h3>
+                        <button
+                            onClick={onClose}
+                            className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Progress Bar with glowing active state */}
+                    {step < 3 && (
+                        <div className="px-8 mt-6">
+                            <div className="flex items-center justify-between relative">
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-white/5 -z-10"></div>
+                                <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-[2px] transition-all duration-500 ease-out bg-gradient-to-r from-primary to-secondary -z-10`} style={{width: step === 1 ? '0%' : '100%'}}></div>
+                                
+                                <div className={`w-8 h-8 rounded-full border-[2px] flex items-center justify-center text-xs font-bold transition-all duration-300 ${step >= 1 ? 'bg-dark border-primary text-primary shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'bg-[#121212] border-white/20 text-gray-500'}`}>1</div>
+                                <div className={`w-8 h-8 rounded-full border-[2px] flex items-center justify-center text-xs font-bold transition-all duration-500 ${step >= 2 ? 'bg-dark border-primary text-primary shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'bg-[#121212] border-white/20 text-gray-500'}`}>2</div>
                             </div>
+                            <div className="flex justify-between mt-2 px-1">
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-primary">Details</span>
+                                <span className={`text-[10px] uppercase font-bold tracking-wider transition-colors ${step >= 2 ? 'text-primary' : 'text-gray-500'}`}>Payment</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar relative">
+                        {step === 1 && (
+                            <form onSubmit={handleDetailsSubmit} className="space-y-6 animate-slide-in-right" key="form-step-1">
+                                <div className="md:hidden bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 backdrop-blur-md">
+                                    <div className="text-xs text-primary font-bold tracking-wider uppercase mb-1">{property.city || property.location || 'Destination'}</div>
+                                    <h4 className="text-white text-xl font-bold mb-2">{property.name}</h4>
+                                    <div className="flex items-end gap-1">
+                                        <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
+                                        <span className="text-gray-500 text-sm pb-1 font-medium">/ night</span>
+                                    </div>
+                                </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-gray-400 ml-1">Check-in</label>
-                                    <div className="relative bg-white/5 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors">
-                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-400" />
+                                <div className="space-y-2 group">
+                                    <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-in Date</label>
+                                    <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
                                         <input
                                             type="date"
                                             required
@@ -280,10 +337,10 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-gray-400 ml-1">Check-out</label>
-                                    <div className="relative bg-white/5 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors">
-                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-400" />
+                                <div className="space-y-2 group">
+                                    <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-out Date</label>
+                                    <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
                                         <input
                                             type="date"
                                             required
@@ -295,78 +352,79 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-xs text-gray-400 ml-1">Guests</label>
-                                <div className="relative bg-white/5 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors">
-                                    <User size={16} className="absolute left-3 top-3.5 text-gray-400" />
+                            <div className="space-y-2 group">
+                                <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Number of Guests</label>
+                                <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                    <User size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
                                     <select
-                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none appearance-none"
+                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none appearance-none cursor-pointer"
                                         value={guests}
                                         onChange={(e) => setGuests(e.target.value)}
                                     >
                                         {[1, 2, 3, 4, 5, 6].map(num => (
-                                            <option key={num} value={num} className="bg-dark text-white">{num} Guests</option>
+                                            <option key={num} value={num} className="bg-dark text-white">{num} {num === 1 ? 'Guest' : 'Guests'}</option>
                                         ))}
                                     </select>
                                 </div>
                             </div>
 
                             {type !== 'hotel' && (
-                                <div className="bg-white/5 border border-white/10 rounded-xl p-4 mt-2">
-                                    <h5 className="text-sm font-bold text-white mb-3">Route & Transport Medium</h5>
-                                    <div className="flex items-center justify-between gap-2 mb-4">
+                                <div className="bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 rounded-2xl p-5 mt-4 relative overflow-hidden backdrop-blur-sm">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                                    <h5 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                        <Plane size={16} className="text-primary"/> Transport Options
+                                    </h5>
+                                    
+                                    <div className="flex items-center justify-between gap-3 mb-5">
                                         <div className="flex-1">
-                                            <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 focus-within:border-primary transition-colors">
+                                            <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
                                                 <input
                                                     type="text"
                                                     required
-                                                    placeholder="e.g., Pune"
-                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center"
+                                                    placeholder="Origin City"
+                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center placeholder-gray-600"
                                                     value={travelingFrom}
                                                     onChange={(e) => setTravelingFrom(e.target.value)}
                                                 />
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col items-center justify-center px-1">
-                                            {transportType === 'Flight' ? <Plane size={16} className="text-primary mb-1" /> :
-                                            transportType === 'Train' ? <Train size={16} className="text-primary mb-1" /> :
-                                            transportType === 'Bus' ? <Bus size={16} className="text-primary mb-1" /> :
-                                            transportType === 'Cab' ? <Car size={16} className="text-primary mb-1" /> :
-                                            transportType === 'Ship' ? <Ship size={16} className="text-primary mb-1" /> :
-                                            <MapPin size={16} className="text-primary mb-1" />}
-                                            <div className="w-8 border-t border-dashed border-gray-500"></div>
+                                        <div className="flex flex-col items-center justify-center px-2">
+                                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-1 animate-pulse">
+                                                {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
+                                                transportType === 'Train' ? <Train size={14} className="text-primary" /> :
+                                                transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
+                                                transportType === 'Cab' ? <Car size={14} className="text-primary" /> :
+                                                transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
+                                                <MapPin size={14} className="text-primary" />}
+                                            </div>
+                                            <div className="w-12 border-t border-dashed border-primary/50"></div>
                                         </div>
 
                                         <div className="flex-1">
-                                            <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 opacity-70">
+                                            <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
                                                 <input
                                                     type="text"
                                                     readOnly
-                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center"
+                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center truncate"
                                                     value={property.location ? property.location.split(',')[0] : "Destination"}
+                                                    title={property.location ? property.location.split(',')[0] : "Destination"}
                                                 />
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs text-gray-400 ml-1">Transport Medium</label>
-                                        <div className="relative bg-dark/50 border border-white/10 rounded-xl p-2.5 focus-within:border-primary transition-colors">
-                                            {transportType === 'Flight' ? <Plane size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
-                                            transportType === 'Train' ? <Train size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
-                                            transportType === 'Bus' ? <Bus size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
-                                            transportType === 'Cab' ? <Car size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
-                                            transportType === 'Ship' ? <Ship size={14} className="absolute left-3 top-3.5 text-gray-400" /> :
-                                            <MapPin size={14} className="absolute left-3 top-3.5 text-gray-400" />}
+                                    <div className="space-y-2 group">
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-gray-500 ml-1">Select Transport</label>
+                                        <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors cursor-pointer hover:border-white/20">
                                             <select
-                                                className="w-full bg-transparent text-white text-xs pl-8 focus:outline-none appearance-none"
+                                                className="w-full bg-transparent text-white text-sm focus:outline-none appearance-none cursor-pointer pl-2"
                                                 value={transportType}
                                                 onChange={(e) => setTransportType(e.target.value)}
                                             >
                                                 {availableTransports.map(mode => (
-                                                    <option key={mode} value={mode} className="bg-dark text-white">
-                                                        {mode}
+                                                    <option key={mode} value={mode} className="bg-dark text-white p-2">
+                                                        {mode} Journey
                                                     </option>
                                                 ))}
                                             </select>
@@ -377,47 +435,39 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
 
                             <button
                                 type="submit"
-                                className="w-full py-4 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-colors mt-4"
+                                className="w-full py-4 mt-6 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group"
                             >
-                                Continue to Payment
+                                <span>Continue to Payment</span>
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                         </form>
                     )}
 
                     {step === 2 && (
-                        <div className="space-y-6">
+                        <div className="space-y-6 animate-slide-in-right" key="form-step-2">
                             {/* UPI Options */}
                             <div>
-                                <h4 className="text-sm text-gray-400 mb-3 uppercase tracking-wider font-semibold text-xs">Recommended</h4>
+                                <h4 className="text-[10px] text-gray-500 mb-3 uppercase tracking-wider font-bold">Quick Pay (UPI)</h4>
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
                                         onClick={() => handleUPIPayment('gpay')}
-                                        className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all hover:scale-105"
+                                        className="flex flex-col items-center justify-center gap-2 h-20 bg-black/40 hover:bg-white/5 border border-white/5 hover:border-white/20 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
                                     >
-                                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden">
-                                            <div className="flex gap-[1px] transform scale-75"><span className="text-blue-500 font-bold">G</span><span className="text-green-500 font-bold">Pay</span></div>
-                                        </div>
-                                        <span className="text-xs text-gray-300">Google Pay</span>
+                                        <div className="flex gap-[1px] transform scale-90"><span className="text-blue-500 font-bold">G</span><span className="text-green-500 font-bold">Pay</span></div>
                                     </button>
 
                                     <button
                                         onClick={() => handleUPIPayment('phonepe')}
-                                        className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all hover:scale-105"
+                                        className="flex flex-col items-center justify-center gap-2 h-20 bg-black/40 hover:bg-[#5f259f]/20 border border-white/5 hover:border-[#5f259f]/50 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5f259f]/50"
                                     >
-                                        <div className="w-10 h-10 bg-[#5f259f] rounded-full flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
-                                            PhonePe
-                                        </div>
-                                        <span className="text-xs text-gray-300">PhonePe</span>
+                                        <div className="text-[#5f259f] font-bold text-sm">PhonePe</div>
                                     </button>
 
                                     <button
                                         onClick={() => handleUPIPayment('paytm')}
-                                        className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all hover:scale-105"
+                                        className="flex flex-col items-center justify-center gap-2 h-20 bg-black/40 hover:bg-[#00baf2]/20 border border-white/5 hover:border-[#00baf2]/50 rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#00baf2]/50"
                                     >
-                                        <div className="w-10 h-10 bg-[#00baf2] rounded-full flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
-                                            Paytm
-                                        </div>
-                                        <span className="text-xs text-gray-300">Paytm</span>
+                                        <div className="text-[#00baf2] font-bold text-sm">Paytm</div>
                                     </button>
                                 </div>
                             </div>
@@ -425,36 +475,41 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                             {/* QR Code Option */}
                             <button
                                 onClick={() => handleUPIPayment('qr')}
-                                className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all group"
+                                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-white/5 to-white/[0.01] hover:from-white/10 hover:to-white/5 border border-white/10 rounded-2xl transition-all group backdrop-blur-sm shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.3)] hover:border-white/20 mt-2"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors">
-                                        <div className="grid grid-cols-2 gap-0.5 w-5 h-5">
-                                            <div className="bg-current rounded-[1px]"></div>
-                                            <div className="bg-current rounded-[1px]"></div>
-                                            <div className="bg-current rounded-[1px]"></div>
-                                            <div className="bg-current rounded-[0.5px] opacity-50"></div>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors rotate-3 group-hover:rotate-0">
+                                        <div className="grid grid-cols-2 gap-[2px] w-5 h-5">
+                                            <div className="bg-current rounded-[2px]"></div>
+                                            <div className="bg-current rounded-[2px] opacity-80"></div>
+                                            <div className="bg-current rounded-[2px] opacity-60"></div>
+                                            <div className="bg-current rounded-[2px] opacity-40"></div>
                                         </div>
                                     </div>
                                     <div className="text-left">
-                                        <div className="text-white font-medium text-sm">Scan QR Code</div>
-                                        <div className="text-gray-400 text-xs">Use any UPI app to scan</div>
+                                        <div className="text-white font-bold text-md">Scan QR Code</div>
+                                        <div className="text-gray-400 text-xs mt-0.5">Instant payment via any UPI app</div>
                                     </div>
                                 </div>
-                                <span className="text-gray-500">→</span>
+                                <ArrowRight size={18} className="text-gray-500 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                             </button>
 
                             {/* Card Details (Stripe Elements) */}
-                            <div>
-                                <h4 className="text-sm text-gray-400 mb-3 uppercase tracking-wider font-semibold text-xs mt-4">Credit / Debit Card</h4>
+                            <div className="pt-2">
+                                <h4 className="text-[10px] text-gray-500 mb-4 uppercase tracking-wider font-bold relative flex items-center">
+                                    <span className="bg-[#121212] pr-3 relative z-10 w-fit">Credit / Debit Card</span>
+                                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-[1px] bg-white/10"></div>
+                                </h4>
                                 {clientSecret ? (
-                                    <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#ffffff' } } }}>
-                                        <CheckoutForm onSuccess={(paymentId) => {
-                                            handleBookingCreation(paymentId);
-                                        }} />
-                                    </Elements>
+                                    <div className="bg-black/50 border border-white/10 rounded-2xl p-5 shadow-inner">
+                                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#6366f1', colorBackground: 'transparent', colorDanger: '#ef4444', spacingUnit: '4px', borderRadius: '12px' } } }}>
+                                            <CheckoutForm onSuccess={(paymentId) => {
+                                                handleBookingCreation(paymentId);
+                                            }} />
+                                        </Elements>
+                                    </div>
                                 ) : (
-                                    <div className="flex justify-center p-8 bg-white/5 rounded-xl border border-white/10">
+                                    <div className="flex justify-center p-12 bg-black/20 rounded-2xl border border-dashed border-white/10">
                                         <Loader2 className="animate-spin text-primary" size={32} />
                                     </div>
                                 )}
@@ -463,27 +518,32 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                     )}
 
                     {step === 3 && (
-                        <div className="h-full flex flex-col items-center justify-center animate-fade-in-up -mt-10">
-                            <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6 text-green-500 scale-100 animate-bounce-slow">
-                                <CheckCircle size={48} />
+                        <div className="h-full flex flex-col items-center justify-center animate-fade-in-up -mt-10 p-8 text-center" key="form-step-3">
+                            <div className="relative mb-8">
+                                <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+                                <div className="w-28 h-28 bg-gradient-to-tr from-green-500 to-green-400 rounded-full flex items-center justify-center text-white scale-100 shadow-[0_0_30px_rgba(34,197,94,0.4)]">
+                                    <CheckCircle size={56} strokeWidth={2.5} />
+                                </div>
                             </div>
-                            <h3 className="text-3xl font-bold text-white mb-2 text-center">Booking Confirmed!</h3>
-                            <p className="text-gray-400 text-sm max-w-[250px] mx-auto mb-8 text-center">
-                                Your payment was successful. We've sent the tickets to your email.
+                            <h3 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 mb-3">Booking Confirmed!</h3>
+                            <p className="text-gray-400 text-md max-w-[280px] mx-auto mb-10 leading-relaxed">
+                                Get ready for your trip. Your itinerary has been securely sent to your inbox.
                             </p>
                             <button
                                 onClick={() => {
                                     onClose();
-                                    window.location.href = '/my-bookings'; // Or use useNavigate if available, but window.location is safer for modal unmount
+                                    window.location.href = '/my-bookings'; // Or use useNavigate if available
                                 }}
-                                className="px-8 py-3 bg-primary text-white rounded-xl font-medium transition-colors hover:bg-primary/90 shadow-lg shadow-primary/25"
+                                className="px-10 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-full font-bold transition-all hover:shadow-[0_10px_30px_rgba(99,102,241,0.4)] hover:-translate-y-1 w-full flex items-center justify-center space-x-2"
                             >
-                                View My Bookings
+                                <span>View My Bookings</span>
+                                <ArrowRight size={18} />
                             </button>
                         </div>
                     )}
                 </div>
             </div>
+        </div>
         </div>
     );
 };

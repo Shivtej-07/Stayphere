@@ -8,7 +8,7 @@ const testimonials = [
         role: "Travel Blogger",
         image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
         rating: 5,
-        text: "Stayphere completely transformed how I travel. The curated selection of hotels is unmatched, and the booking process was seamless. Highly recommend!"
+        text: "Dharam Yatra completely transformed how I travel. The curated selection of hotels is unmatched, and the booking process was seamless. Highly recommend!"
     },
     {
         id: 2,
@@ -16,7 +16,7 @@ const testimonials = [
         role: "Business Traveler",
         image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         rating: 5,
-        text: "I travel frequently for work, and finding a reliable, high-quality stay is crucial. Stayphere has never let me down. The 24/7 support is a life saver."
+        text: "I travel frequently for work, and finding a reliable, high-quality stay is crucial. Dharam Yatra has never let me down. The 24/7 support is a life saver."
     },
     {
         id: 3,

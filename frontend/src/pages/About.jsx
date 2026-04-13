@@ -28,7 +28,7 @@ const About = () => {
           </h1>
           
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 mb-10 leading-relaxed">
-            Stayphere is more than a booking platform. We're your gateway to extraordinary destinations, seamlessly connecting you with curated stays and effortless transport worldwide.
+            Dharam Yatra is more than a booking platform. We're your gateway to extraordinary destinations, seamlessly connecting you with curated stays and effortless transport worldwide.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -62,7 +62,7 @@ const About = () => {
       <section className="py-24 relative z-10 bg-slate-900/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Why Choose <span className="text-primary">Stayphere</span></h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Why Choose <span className="text-primary">Dharam Yatra</span></h2>
             <p className="text-slate-400 max-w-2xl mx-auto text-lg">We've built our platform on a foundation of trust, innovation, and an unwavering commitment to exceptional travel experiences.</p>
           </div>
 
@@ -105,13 +105,13 @@ const About = () => {
               <h2 className="text-4xl md:text-5xl font-bold mb-6">Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Story</span></h2>
               <div className="space-y-6 text-slate-300 text-lg leading-relaxed">
                 <p>
-                  Founded with a passion for connecting people to awe-inspiring places, Stayphere began with a simple idea: travel should be effortless, secure, and profoundly enriching.
+                  Founded with a passion for connecting people to awe-inspiring places, Dharam Yatra began with a simple idea: travel should be effortless, secure, and profoundly enriching.
                 </p>
                 <p>
                   We recognized a gap in the market for a platform that not only offered exceptional stays but also integrated seamless transportation options, providing an end-to-end journey solution. 
                 </p>
                 <p>
-                  Today, we're proud to serve a global community of modern explorers, continuously innovating our technology to ensure every trip booked through Stayphere is a gateway to unforgettable memories.
+                  Today, we're proud to serve a global community of modern explorers, continuously innovating our technology to ensure every trip booked through Dharam Yatra is a gateway to unforgettable memories.
                 </p>
               </div>
             </div>

@@ -37,8 +37,8 @@ const Footer = () => {
             <div className="container mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <div className="md:col-span-1">
-                        <Link to="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-6 block">
-                            Stayphere
+                        <Link to="/" className="flex items-center mb-6">
+                            <img src="/logo.png" alt="Dharam Yatra" className="h-14 w-auto rounded-lg bg-white p-1" />
                         </Link>
                         <p className="text-gray-400 leading-relaxed mb-6">
                             Experience the world's most luxurious stays and unforgettable journeys. We curate comfort and style for your perfect getaway.
@@ -94,7 +94,7 @@ const Footer = () => {
 
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
                     <div className="flex flex-col md:flex-row items-center md:space-x-4 space-y-2 md:space-y-0">
-                        <p>&copy; {new Date().getFullYear()} Stayphere. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} Dharam Yatra. All rights reserved.</p>
                         {visitorCount !== null && (
                             <div className="flex items-center space-x-1 text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
                                 <Users size={14} />

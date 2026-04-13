@@ -97,3 +97,47 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
+
+/* Custom Property Hover Animations based on Category */
+.group:hover .animate-hover-wave {
+  animation: wave 3s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%, 100% { transform: scale(1.1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-1.5deg); }
+  75% { transform: scale(1.1) rotate(1.5deg); }
+}
+
+.group:hover .animate-hover-pulse-fast {
+  animation: pulseFast 1.5s infinite alternate;
+}
+
+@keyframes pulseFast {
+  from { transform: scale(1); filter: brightness(1); }
+  to { transform: scale(1.1); filter: brightness(1.15); }
+}
+
+.group:hover .animate-hover-glow {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.4)) brightness(1.1);
+}
+
+.group:hover .animate-hover-float {
+  transform: scale(1.1) translateY(-8px);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
