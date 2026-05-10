@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, TrendingUp, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import FavoriteButton from './FavoriteButton';
 import { formatPriceForCountry } from '../utils/currencyUtil';
@@ -61,7 +62,12 @@ const Destinations = () => {
 
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                        >
                             <div className="flex items-center space-x-2 mb-2">
                                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                                 <span className="text-red-400 text-xs font-bold uppercase tracking-widest">Live Updates</span>
@@ -71,15 +77,25 @@ const Destinations = () => {
                                     Trending Destinations
                                 </span>
                             </h2>
-                        </div>
-                        <p className="text-gray-400 text-lg max-w-md md:text-right">
+                        </motion.div>
+                        <motion.p 
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="text-gray-400 text-lg max-w-md md:text-right"
+                        >
                             Explore our handpicked destinations for your next adventure.
-                        </p>
+                        </motion.p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {destinations.map((dest) => (
-                            <div
+                        {destinations.map((dest, index) => (
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
                                 key={dest.id}
                                 className="group relative h-[450px] rounded-3xl overflow-hidden cursor-pointer shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-primary/20"
                                 onClick={() => handleCardClick(dest.id)}
@@ -137,7 +153,7 @@ const Destinations = () => {
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>

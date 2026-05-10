@@ -17,6 +17,12 @@ const getDestinations = async (req, res) => {
 // @access  Private/Admin
 const createDestination = async (req, res) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const destination = new Destination(req.body);
         const createdDestination = await destination.save();
         res.status(201).json(createdDestination);
@@ -30,6 +36,12 @@ const createDestination = async (req, res) => {
 // @access  Private/Admin
 const updateDestination = async (req, res) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const destination = await Destination.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true

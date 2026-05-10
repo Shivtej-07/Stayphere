@@ -39,19 +39,35 @@ const Navbar = () => {
     };
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-dark/80 backdrop-blur-md shadow-lg py-4' : 'bg-transparent py-6'}`}>
-            <div className="container mx-auto px-6 flex justify-between items-center">
-                <Link to="/" className="flex items-center text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <div className={`fixed w-full z-50 transition-all duration-500 flex justify-center ${scrolled ? 'top-4 px-4' : 'top-0'}`}>
+            <nav className={`w-full transition-all duration-500 ${scrolled ? 'max-w-7xl rounded-full glass-panel py-3 border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]' : 'bg-transparent py-6'}`}>
+                <div className="container mx-auto px-6 flex justify-between items-center">
+                    <Link to="/" className="flex items-center text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent transform transition hover:scale-105">
                     <img src="/logo.png" alt="Dharam Yatra" className="h-12 w-auto mr-2" />
                 </Link>
 
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center space-x-8">
-                    <Link to="/" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Home</Link>
-                    <Link to="/stays" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Stays</Link>
-                    <Link to="/transport" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Transport</Link>
-                    <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">About</Link>
-                    <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">Contact</Link>
+                    <Link to="/" className="text-gray-300 hover:text-white transition-colors text-sm font-medium relative group">
+                        Home
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link to="/stays" className="text-gray-300 hover:text-white transition-colors text-sm font-medium relative group">
+                        Stays
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link to="/transport" className="text-gray-300 hover:text-white transition-colors text-sm font-medium relative group">
+                        Transport
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm font-medium relative group">
+                        About
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm font-medium relative group">
+                        Contact
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
                     {user && user.isAdmin && (
                         <Link to="/admin" className="text-primary hover:text-primary/80 transition-colors text-sm font-medium">Dashboard</Link>
                     )}
@@ -150,7 +166,8 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
-        </nav>
+            </nav>
+        </div>
     );
 };
 

@@ -5,6 +5,12 @@ const Hotel = require('../models/Hotel');
 // @access  Admin
 exports.createHotel = async (req, res, next) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const hotel = await Hotel.create(req.body);
         res.status(201).json({
             success: true,
@@ -71,6 +77,12 @@ exports.getHotelsByDistance = async (req, res, next) => {
 // @access  Admin
 exports.updateHotel = async (req, res, next) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const hotel = await Hotel.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true

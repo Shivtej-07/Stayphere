@@ -8,11 +8,12 @@ const {
     getDestinationById
 } = require('../controllers/destinationController');
 const { protect, admin } = require('../middleware/adminMiddleware');
+const { upload } = require('../config/cloudinary');
 
-router.route('/').get(getDestinations).post(protect, admin, createDestination);
+router.route('/').get(getDestinations).post(protect, admin, upload.array('photos', 10), createDestination);
 router.route('/:id')
     .get(getDestinationById)
-    .put(protect, admin, updateDestination)
+    .put(protect, admin, upload.array('photos', 10), updateDestination)
     .delete(protect, admin, deleteDestination);
 
 module.exports = router;

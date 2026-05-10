@@ -6,9 +6,9 @@ import { API_BASE_URL } from '../../config';
 const AddTransport = ({ setMessage, onSuccess }) => {
     const [transportData, setTransportData] = useState({
         type: 'flight', company: '', from: '', to: '',
-        departureTime: '', arrivalTime: '', price: 0, seatsAvailable: 0,
-        photos: '' // Comma separated
+        departureTime: '', arrivalTime: '', price: 0, seatsAvailable: 0
     });
+    const [photoFiles, setPhotoFiles] = useState([]);
 
     const handleTransportChange = (e) => setTransportData({ ...transportData, [e.target.name]: e.target.value });
 
@@ -16,14 +16,16 @@ const AddTransport = ({ setMessage, onSuccess }) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const payload = {
-                ...transportData,
-                photos: transportData.photos ? transportData.photos.split(',').map(p => p.trim()) : []
-            };
-            await axios.post(`${API_BASE_URL}/transports`, payload, config);
+            const config = { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } };
+            
+            const formData = new FormData();
+            Object.keys(transportData).forEach(key => formData.append(key, transportData[key]));
+            photoFiles.forEach(file => formData.append('photos', file));
+
+            await axios.post(`${API_BASE_URL}/transports`, formData, config);
             setMessage('Transport added successfully!');
-            setTransportData({ type: 'flight', company: '', from: '', to: '', departureTime: '', arrivalTime: '', price: 0, seatsAvailable: 0, photos: '' });
+            setTransportData({ type: 'flight', company: '', from: '', to: '', departureTime: '', arrivalTime: '', price: 0, seatsAvailable: 0 });
+            setPhotoFiles([]);
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessage('Error adding transport: ' + (error.response?.data?.message || error.message));
@@ -76,7 +78,7 @@ const AddTransport = ({ setMessage, onSuccess }) => {
                 </div>
             </div>
 
-            <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none transition-colors" name="photos" placeholder="Photos (comma separated URLs)" value={transportData.photos} onChange={handleTransportChange} />
+            <input type="file" multiple accept="image/*" className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none transition-colors" name="photos" onChange={(e) => setPhotoFiles(Array.from(e.target.files))} />
 
             <button type="submit" className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2">
                 <Plus size={20} /> Add Transport

@@ -3,6 +3,7 @@ import { Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
 import { GoogleLogin } from '@react-oauth/google';
+import PageTransition from '../components/PageTransition';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -117,8 +118,9 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-12 flex items-center justify-center relative overflow-hidden bg-dark">
-            {/* Background Elements */}
+        <PageTransition>
+            <div className="min-h-screen pt-20 pb-12 flex items-center justify-center relative overflow-hidden bg-dark">
+                {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/20 rounded-full blur-[120px]"></div>
@@ -300,6 +302,7 @@ const Login = () => {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 };
 

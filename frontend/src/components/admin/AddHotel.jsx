@@ -6,9 +6,9 @@ import { API_BASE_URL } from '../../config';
 const AddHotel = ({ setMessage, onSuccess }) => {
     const [hotelData, setHotelData] = useState({
         name: '', type: '', city: '', address: '', distance: '',
-        title: '', description: '', cheapestPrice: 0, featured: false,
-        photos: '' // Comma separated
+        title: '', description: '', cheapestPrice: 0, featured: false
     });
+    const [photoFiles, setPhotoFiles] = useState([]);
 
     const handleHotelChange = (e) => setHotelData({ ...hotelData, [e.target.name]: e.target.value });
 
@@ -16,14 +16,16 @@ const AddHotel = ({ setMessage, onSuccess }) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const payload = {
-                ...hotelData,
-                photos: hotelData.photos ? hotelData.photos.split(',').map(p => p.trim()).filter(p => p !== '') : []
-            };
-            await axios.post(`${API_BASE_URL}/hotels`, payload, config);
+            const config = { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } };
+            
+            const formData = new FormData();
+            Object.keys(hotelData).forEach(key => formData.append(key, hotelData[key]));
+            photoFiles.forEach(file => formData.append('photos', file));
+
+            await axios.post(`${API_BASE_URL}/hotels`, formData, config);
             setMessage('Hotel added successfully!');
-            setHotelData({ name: '', type: '', city: '', address: '', distance: '', title: '', description: '', cheapestPrice: 0, featured: false, photos: '' });
+            setHotelData({ name: '', type: '', city: '', address: '', distance: '', title: '', description: '', cheapestPrice: 0, featured: false });
+            setPhotoFiles([]);
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessage('Error adding hotel: ' + (error.response?.data?.error || error.message));
@@ -46,7 +48,7 @@ const AddHotel = ({ setMessage, onSuccess }) => {
                     <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none transition-colors" name="distance" placeholder="Distance from center" value={hotelData.distance} onChange={handleHotelChange} required />
                     <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none transition-colors" name="title" placeholder="Promo Title" value={hotelData.title} onChange={handleHotelChange} required />
                     <input type="number" className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none transition-colors" name="cheapestPrice" placeholder="Base Price ($)" value={hotelData.cheapestPrice} onChange={handleHotelChange} required />
-                    <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none transition-colors" name="photos" placeholder="Photos (comma separated URLs)" value={hotelData.photos} onChange={handleHotelChange} />
+                    <input type="file" multiple accept="image/*" className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none transition-colors" name="photos" onChange={(e) => setPhotoFiles(Array.from(e.target.files))} />
                 </div>
             </div>
 

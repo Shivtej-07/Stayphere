@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, MapPin, Star, Filter, ArrowRight, Eye, Clock, Zap } from 'lucide-react';
+import PageTransition from '../components/PageTransition';
 import { useNavigate } from 'react-router-dom';
 import BookingModal from '../components/BookingModal';
 import { API_BASE_URL } from '../config';
@@ -195,7 +196,7 @@ const Stays = () => {
     };
 
     return (
-        <>
+        <PageTransition>
             <div className="min-h-screen bg-dark pt-24 pb-12 px-6">
                 {/* Background decoration */}
                 <div className="fixed top-20 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/3"></div>
@@ -359,7 +360,7 @@ const Stays = () => {
                 property={selectedStay}
                 type="hotel"
             />
-        </>
+        </PageTransition>
     );
 };
 

@@ -5,9 +5,9 @@ import { API_BASE_URL } from '../../config';
 
 const AddDestination = ({ setMessage, onSuccess }) => {
     const [destinationData, setDestinationData] = useState({
-        name: '', description: '', featured: false,
-        photos: '' // Comma separated
+        name: '', description: '', featured: false
     });
+    const [photoFiles, setPhotoFiles] = useState([]);
 
     const handleDestinationChange = (e) => setDestinationData({ ...destinationData, [e.target.name]: e.target.value });
 
@@ -18,18 +18,19 @@ const AddDestination = ({ setMessage, onSuccess }) => {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('No authentication token');
 
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const payload = {
-                ...destinationData,
-                photos: destinationData.photos ? destinationData.photos.split(',').map(p => p.trim()).filter(p => p !== '') : []
-            };
+            const config = { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } };
+            
+            const formData = new FormData();
+            Object.keys(destinationData).forEach(key => formData.append(key, destinationData[key]));
+            photoFiles.forEach(file => formData.append('photos', file));
 
-            console.log('Payload:', payload);
-            const res = await axios.post(`${API_BASE_URL}/destinations`, payload, config);
+            console.log('Payload FormData');
+            const res = await axios.post(`${API_BASE_URL}/destinations`, formData, config);
             console.log('Response:', res.data);
 
             setMessage('Destination added successfully!');
-            setDestinationData({ name: '', description: '', featured: false, photos: '' });
+            setDestinationData({ name: '', description: '', featured: false });
+            setPhotoFiles([]);
             if (onSuccess) onSuccess();
         } catch (error) {
             console.error('Add Destination Error:', error);
@@ -51,7 +52,7 @@ const AddDestination = ({ setMessage, onSuccess }) => {
             <div className="space-y-4">
                 <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none transition-colors" name="name" placeholder="Destination Name" value={destinationData.name} onChange={handleDestinationChange} required />
                 <textarea className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none transition-colors h-32 resize-none" name="description" placeholder="Description" value={destinationData.description} onChange={handleDestinationChange} required />
-                <input className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none transition-colors" name="photos" placeholder="Photos (comma separated URLs)" value={destinationData.photos} onChange={handleDestinationChange} />
+                <input type="file" multiple accept="image/*" className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none transition-colors" name="photos" onChange={(e) => setPhotoFiles(Array.from(e.target.files))} />
             </div>
 
             <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5 w-fit">

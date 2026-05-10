@@ -32,6 +32,12 @@ const getTransports = async (req, res) => {
 // @access  Private (Admin only - for now public for easy seeding)
 const createTransport = async (req, res) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const transport = await Transport.create(req.body);
         res.status(201).json(transport);
     } catch (error) {
@@ -44,6 +50,12 @@ const createTransport = async (req, res) => {
 // @access  Admin
 const updateTransport = async (req, res) => {
     try {
+        if (req.files && req.files.length > 0) {
+            req.body.photos = req.files.map(file => file.path);
+        } else if (req.body.photos && typeof req.body.photos === 'string') {
+            req.body.photos = req.body.photos.split(',').map(p => p.trim()).filter(p => p !== '');
+        }
+
         const transport = await Transport.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true

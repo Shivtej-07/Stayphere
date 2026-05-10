@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Camera, Save, Edit2, X, AlertCircle, CheckCircle, Navigation } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import PageTransition from '../components/PageTransition';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -170,8 +171,9 @@ const Profile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-dark pt-28 pb-12 px-6">
-            <div className="container mx-auto max-w-3xl">
+        <PageTransition>
+            <div className="min-h-screen bg-dark pt-28 pb-12 px-6">
+                <div className="container mx-auto max-w-3xl">
                 
                 {/* Header Header */}
                 <div className="flex flex-col md:flex-row items-center justify-between mb-8">
@@ -382,6 +384,7 @@ const Profile = () => {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 };
 

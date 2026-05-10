@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Star, MapPin, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import BookingModal from './BookingModal';
 import { API_BASE_URL } from '../config';
 import { formatPriceForCountry } from '../utils/currencyUtil';
@@ -39,7 +40,7 @@ const TiltCard = ({ children, onClick }) => {
             style={{
                 transform: `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
             }}
-            className="relative bg-gray-800 rounded-2xl shadow-xl overflow-hidden transition-transform duration-100 ease-out cursor-pointer group hover:z-10"
+            className="relative glass-card rounded-3xl overflow-hidden cursor-pointer group hover:z-10"
         >
             {/* Glow Effect */}
             <div
@@ -99,13 +100,20 @@ const FeaturedStays = () => {
         <>
             <section className="py-20 bg-dark text-white relative overflow-hidden">
                 {/* Background Blobs */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                    <div className="absolute top-1/4 -left-64 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-1/4 -left-64 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-float-smooth"></div>
+                    <div className="absolute bottom-1/4 -right-64 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[120px] animate-float-smooth" style={{ animationDelay: '2s' }}></div>
                 </div>
+                <div className="absolute inset-0 bg-mesh-dark opacity-10 mix-blend-screen pointer-events-none"></div>
 
                 <div className="container mx-auto px-6 relative z-10">
-                    <div className="flex justify-between items-end mb-12 animate-on-scroll">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        className="flex justify-between items-end mb-12"
+                    >
                         <div>
                             <h2 className="text-4xl md:text-5xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Featured Stays</h2>
                             <p className="text-gray-400 text-lg">Discover our most popular properties</p>
@@ -114,11 +122,17 @@ const FeaturedStays = () => {
                             <span>View All</span>
                             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </button>
-                    </div>
+                    </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {stays.map((stay, index) => (
-                            <div key={stay.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                            <motion.div 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                key={stay.id} 
+                            >
                                 <TiltCard onClick={() => handleBookClick(stay)}>
                                     <div className="h-64 overflow-hidden">
                                         <img
@@ -156,7 +170,7 @@ const FeaturedStays = () => {
                                         </div>
                                     </div>
                                 </TiltCard>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
 
