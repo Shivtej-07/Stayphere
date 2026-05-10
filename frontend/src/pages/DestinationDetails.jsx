@@ -114,11 +114,30 @@ const DestinationDetails = () => {
                                 <button className="p-3 md:p-4 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10">
                                     <Share2 size={20} />
                                 </button>
-                                <button className="p-3 md:p-4 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10">
+                                <button 
+                                    onClick={() => {
+                                        const token = localStorage.getItem('token');
+                                        if (!token) {
+                                            alert('Please login to save to favorites.');
+                                            navigate('/login');
+                                        } else {
+                                            alert('Added to favorites!');
+                                        }
+                                    }}
+                                    className="p-3 md:p-4 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10"
+                                >
                                     <Heart size={20} />
                                 </button>
                                 <button
-                                    onClick={() => setIsBookingModalOpen(true)}
+                                    onClick={() => {
+                                        const token = localStorage.getItem('token');
+                                        if (!token) {
+                                            alert('Please login to continue booking.');
+                                            navigate('/login');
+                                            return;
+                                        }
+                                        setIsBookingModalOpen(true);
+                                    }}
                                     className="px-8 py-3 md:py-4 bg-primary text-white font-bold rounded-full uppercase tracking-wider hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 transform hover:-translate-y-1"
                                 >
                                     Book This Trip
@@ -242,7 +261,15 @@ const DestinationDetails = () => {
                                 </div>
 
                                 <button
-                                    onClick={() => setIsBookingModalOpen(true)}
+                                    onClick={() => {
+                                        const token = localStorage.getItem('token');
+                                        if (!token) {
+                                            alert('Please login to continue booking.');
+                                            navigate('/login');
+                                            return;
+                                        }
+                                        setIsBookingModalOpen(true);
+                                    }}
                                     className="w-full py-4 bg-primary text-white font-bold rounded-xl uppercase tracking-wider hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 mb-4"
                                 >
                                     Book Now
@@ -253,7 +280,7 @@ const DestinationDetails = () => {
                                 </p>
                             </div>
 
-                            <WeatherWidget location={destination.locationName} />
+                            <WeatherWidget location={destination.name.includes(',') ? destination.name.split(',').slice(-2, -1)[0].trim() : destination.locationName} />
 
                             <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
                                 <h3 className="font-bold mb-4">Why Book With Us?</h3>

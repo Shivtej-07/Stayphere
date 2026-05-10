@@ -191,6 +191,12 @@ const Stays = () => {
     });
 
     const handleBookClick = (stay) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to continue booking.');
+            navigate('/login');
+            return;
+        }
         setSelectedStay(stay);
         setIsModalOpen(true);
     };

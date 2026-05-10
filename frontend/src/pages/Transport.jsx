@@ -61,6 +61,13 @@ const Transport = () => {
     };
 
     const handleBookClick = (transport) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to continue booking.');
+            // we need to make sure navigate is available, but navigate is not defined in Transport.jsx! Let's just use window.location.href or add useNavigate
+            window.location.href = '/login';
+            return;
+        }
         setSelectedTransport({
             ...transport,
             name: `${transport.company} - ${transport.from} to ${transport.to}`

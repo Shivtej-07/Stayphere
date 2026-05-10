@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2, MapPin, Plane, Train, Bus, Car, Ship } from 'lucide-react';
+import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2, MapPin, Plane, Train, Bus, Car, Ship, ArrowRight } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './CheckoutForm';

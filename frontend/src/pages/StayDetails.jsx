@@ -228,7 +228,15 @@ const StayDetails = () => {
                             </div>
 
                             <button
-                                onClick={() => setIsModalOpen(true)}
+                                onClick={() => {
+                                    const token = localStorage.getItem('token');
+                                    if (!token) {
+                                        alert('Please login to continue booking.');
+                                        navigate('/login');
+                                        return;
+                                    }
+                                    setIsModalOpen(true);
+                                }}
                                 className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 transform hover:-translate-y-1"
                             >
                                 Book This Stay
