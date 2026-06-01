@@ -10,6 +10,6 @@ router.post('/google', googleLogin);
 router.get('/users', protect, admin, getAllUsers);
 router.delete('/users/:id', protect, admin, deleteUser);
 router.get('/me', protect, getMe);
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, upload.single('avatar'), updateProfile);
 
 module.exports = router;

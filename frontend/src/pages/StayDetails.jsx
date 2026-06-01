@@ -84,10 +84,10 @@ const StayDetails = () => {
             } else {
                 // Fetch from API
                 try {
-                    const response = await fetch(`${API_BASE_URL}/hotels`);
+                    const response = await fetch(`${API_BASE_URL}/hotels/${id}`);
                     if (response.ok) {
                         const json = await response.json();
-                        const apiStay = (json.data || []).find(s => s._id === id);
+                        const apiStay = json.data;
 
                         if (apiStay) {
                             const hasValidPhoto = apiStay.photos && apiStay.photos.length > 0 &&

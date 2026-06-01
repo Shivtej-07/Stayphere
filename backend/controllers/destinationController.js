@@ -1,12 +1,34 @@
 const Destination = require('../models/Destination');
 
-// @desc    Get all destinations
-// @route   GET /api/destinations
-// @access  Public
 const getDestinations = async (req, res) => {
     try {
-        const destinations = await Destination.find({});
-        res.json(destinations);
+        let query = Destination.find({});
+
+        const page = parseInt(req.query.page, 10);
+        const limit = parseInt(req.query.limit, 10);
+
+        if (!isNaN(page) && !isNaN(limit)) {
+            const total = await Destination.countDocuments();
+            const startIndex = (page - 1) * limit;
+            query = query.skip(startIndex).limit(limit);
+            const destinations = await query;
+            const pages = Math.ceil(total / limit);
+
+            res.json({
+                success: true,
+                count: destinations.length,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages
+                },
+                data: destinations
+            });
+        } else {
+            const destinations = await query;
+            res.json(destinations);
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

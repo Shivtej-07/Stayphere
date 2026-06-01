@@ -39,6 +39,34 @@ const MyBookings = () => {
         fetchBookings();
     }, []);
 
+    const handleCancel = async (bookingId) => {
+        if (!window.confirm("Are you sure you want to cancel this booking? You will receive a full refund if applicable.")) {
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Booking cancelled successfully!");
+                setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, status: 'cancelled' } : b));
+            } else {
+                alert(data.error || "Failed to cancel booking");
+            }
+        } catch (err) {
+            console.error("Error cancelling booking:", err);
+            alert("Something went wrong. Please try again.");
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-dark pt-24 pb-12 px-6 flex items-center justify-center">
@@ -122,13 +150,23 @@ const MyBookings = () => {
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                                            <span className="text-xs text-gray-500">
-                                                Booked on {new Date(booking.createdAt).toLocaleDateString()}
-                                            </span>
-                                            <button className="text-primary text-sm font-bold hover:underline flex items-center">
-                                                View Details <ArrowRight size={16} className="ml-1" />
-                                            </button>
-                                        </div>
+                                             <span className="text-xs text-gray-500">
+                                                 Booked on {new Date(booking.createdAt).toLocaleDateString()}
+                                             </span>
+                                             <div className="flex items-center space-x-4">
+                                                 {booking.status === 'booked' && (
+                                                     <button
+                                                         onClick={() => handleCancel(booking._id)}
+                                                         className="text-red-500 hover:text-red-400 text-sm font-bold transition-colors"
+                                                     >
+                                                         Cancel Booking
+                                                     </button>
+                                                 )}
+                                                 <button className="text-primary text-sm font-bold hover:underline flex items-center">
+                                                     View Details <ArrowRight size={16} className="ml-1" />
+                                                 </button>
+                                             </div>
+                                         </div>
                                     </div>
                                 </div>
                             </div>

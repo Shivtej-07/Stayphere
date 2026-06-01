@@ -1,4 +1,6 @@
 const Booking = require('../models/Booking');
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // @desc    Create a new booking
 // @route   POST /api/bookings
@@ -80,6 +82,48 @@ exports.deleteBooking = async (req, res) => {
         res.json({ message: 'Booking removed' });
     } catch (error) {
         console.error('Delete Booking Error:', error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+};
+
+// @desc    Cancel booking
+// @route   POST /api/bookings/:id/cancel
+// @access  Private
+exports.cancelBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        // Make sure user owns the booking or is admin
+        if (booking.user.toString() !== req.user.id && !req.user.isAdmin) {
+            return res.status(401).json({ error: 'Not authorized to cancel this booking' });
+        }
+
+        if (booking.status === 'cancelled') {
+            return res.status(400).json({ error: 'Booking is already cancelled' });
+        }
+
+        // Process refund if paymentId exists and is a Stripe payment intent ID
+        if (booking.paymentId && booking.paymentId.startsWith('pi_')) {
+            try {
+                await stripe.refunds.create({
+                    payment_intent: booking.paymentId,
+                });
+            } catch (stripeError) {
+                console.error('Stripe Refund Error:', stripeError);
+                return res.status(400).json({ error: `Stripe refund failed: ${stripeError.message}` });
+            }
+        }
+
+        booking.status = 'cancelled';
+        await booking.save();
+
+        res.json({ success: true, message: 'Booking cancelled and refunded successfully', booking });
+    } catch (error) {
+        console.error('Cancel Booking Error:', error);
         res.status(500).json({ error: 'Server Error' });
     }
 };

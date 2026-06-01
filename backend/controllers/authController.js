@@ -6,6 +6,12 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT
 const generateToken = (id) => {
+    if (!process.env.JWT_SECRET) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error('FATAL: JWT_SECRET environment variable is missing.');
+        }
+        console.warn('WARNING: JWT_SECRET is missing. Using development fallback.');
+    }
     return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', {
         expiresIn: '30d',
     });
@@ -209,18 +215,12 @@ exports.getMe = async (req, res) => {
 // @access  Private
 exports.updateProfile = async (req, res) => {
     try {
-        console.log("UPDATE PROFILE CALLED. Body:", req.body, "File:", req.file);
-        console.log("Req.user:", req.user);
-        
         const user = await User.findById(req.user._id);
-
-        console.log("Found user:", user !== null);
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        console.log("Updating fields...");
         // Handle simple fields
         user.username = (req.body && req.body.username) ? req.body.username : user.username;
         user.email = (req.body && req.body.email) ? req.body.email : user.email;
@@ -230,7 +230,6 @@ exports.updateProfile = async (req, res) => {
             user.password = req.body.password;
         }
 
-        console.log("Updating avatar...");
         // Handle Avatar Upload
         if (req.file) {
              user.avatar = req.file.path; // Cloudinary URL
@@ -238,10 +237,8 @@ exports.updateProfile = async (req, res) => {
              user.avatar = req.body.avatarUrl;
         }
 
-        console.log("Saving user:", user.username);
         const updatedUser = await user.save();
         
-        console.log("User saved, returning response:", updatedUser.username);
         res.status(200).json({
             success: true,
             user: {

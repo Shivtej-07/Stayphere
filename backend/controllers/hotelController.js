@@ -21,17 +21,42 @@ exports.createHotel = async (req, res, next) => {
     }
 };
 
-// @desc    Get all hotels
-// @route   GET /api/hotels
-// @access  Public
 exports.getHotels = async (req, res, next) => {
     try {
-        const hotels = await Hotel.find();
-        res.status(200).json({
-            success: true,
-            count: hotels.length,
-            data: hotels,
-        });
+        let query = Hotel.find();
+
+        // Pagination
+        const page = parseInt(req.query.page, 10);
+        const limit = parseInt(req.query.limit, 10);
+        
+        let hotels;
+        let total = await Hotel.countDocuments();
+
+        if (!isNaN(page) && !isNaN(limit)) {
+            const startIndex = (page - 1) * limit;
+            query = query.skip(startIndex).limit(limit);
+            hotels = await query;
+            const pages = Math.ceil(total / limit);
+            
+            res.status(200).json({
+                success: true,
+                count: hotels.length,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages
+                },
+                data: hotels,
+            });
+        } else {
+            hotels = await query;
+            res.status(200).json({
+                success: true,
+                count: hotels.length,
+                data: hotels,
+            });
+        }
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });
     }
@@ -117,6 +142,28 @@ exports.deleteHotel = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: {}
+        });
+    } catch (err) {
+        res.status(400).json({ success: false, error: err.message });
+    }
+};
+
+// @desc    Get single hotel details
+// @route   GET /api/hotels/:id
+// @access  Public
+exports.getHotel = async (req, res, next) => {
+    try {
+        const hotel = await Hotel.findById(req.params.id)
+            .populate('rooms')
+            .populate('facilities');
+
+        if (!hotel) {
+            return res.status(404).json({ success: false, error: 'Hotel not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: hotel,
         });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });

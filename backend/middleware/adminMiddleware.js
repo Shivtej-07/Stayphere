@@ -12,6 +12,12 @@ const protect = async (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(' ')[1];
+            if (!process.env.JWT_SECRET) {
+                if (process.env.NODE_ENV === 'production') {
+                    throw new Error('FATAL: JWT_SECRET environment variable is missing.');
+                }
+                console.warn('WARNING: JWT_SECRET is missing. Using development fallback.');
+            }
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123');
             console.log("Token decoded:", decoded.id);
             req.user = await User.findById(decoded.id).select('-password');

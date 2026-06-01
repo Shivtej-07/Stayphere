@@ -1,11 +1,8 @@
 const Transport = require('../models/Transport');
 
-// @desc    Get all transport options or filter by query
-// @route   GET /api/transports
-// @access  Public
 const getTransports = async (req, res) => {
     try {
-        const { from, to, type, date } = req.query;
+        const { from, to, type, date, page, limit } = req.query;
         console.log('getTransports query params:', req.query);
         let query = {};
 
@@ -20,8 +17,32 @@ const getTransports = async (req, res) => {
             query.departureTime = { $gte: startDate, $lt: endDate };
         }
 
-        const transports = await Transport.find(query).sort({ departureTime: 1 });
-        res.status(200).json(transports);
+        let findQuery = Transport.find(query).sort({ departureTime: 1 });
+        const pageNum = parseInt(page, 10);
+        const limitNum = parseInt(limit, 10);
+
+        if (!isNaN(pageNum) && !isNaN(limitNum)) {
+            const total = await Transport.countDocuments(query);
+            const startIndex = (pageNum - 1) * limitNum;
+            findQuery = findQuery.skip(startIndex).limit(limitNum);
+            const transports = await findQuery;
+            const pages = Math.ceil(total / limitNum);
+
+            res.status(200).json({
+                success: true,
+                count: transports.length,
+                pagination: {
+                    page: pageNum,
+                    limit: limitNum,
+                    total,
+                    pages
+                },
+                data: transports
+            });
+        } else {
+            const transports = await findQuery;
+            res.status(200).json(transports);
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -38,12 +38,6 @@ const HotelSchema = new mongoose.Schema({
         max: 5,
     },
     rooms: {
-        type: [String], // Keeping as String for now to match current usage if just IDs are stored, or update to ObjectId if intended.
-        // Actually, let's make it robust. References are usually ObjectId.
-        // If the user intends just strings, that's fine, but better practice is ObjectId.
-        // However, looking at Room.js, it has roomNumbers. 
-        // Let's stick to the plan: "Review and update Hotel.js relationships".
-        // Changing to ObjectId ref makes 'populate' work.
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Room',
     },
@@ -68,9 +62,10 @@ const HotelSchema = new mongoose.Schema({
         coordinates: {
             type: [Number],
             required: false,
-            index: '2dsphere', // 2dsphere index for proximity queries
         },
     },
 });
+
+HotelSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('Hotel', HotelSchema);

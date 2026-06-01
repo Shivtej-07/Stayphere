@@ -25,9 +25,10 @@ const DestinationSchema = new mongoose.Schema({
         coordinates: {
             type: [Number],
             required: false,
-            index: '2dsphere',
         },
     },
 });
+
+DestinationSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('Destination', DestinationSchema);
