@@ -299,7 +299,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 onClick={onClose}
             ></div>
 
-            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden animate-fade-in-scale h-[600px] flex flex-col md:flex-row shadow-[0_0_50px_rgba(99,102,241,0.15)] glow-border">
+            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden animate-fade-in-scale h-[85vh] md:h-[600px] flex flex-col md:flex-row shadow-[0_0_50px_rgba(99,102,241,0.15)] glow-border">
                 
                 {/* Left Side: Dynamic Animated Image Panel */}
                 <div className="hidden md:block md:w-1/2 relative bg-dark overflow-hidden group">
@@ -426,9 +426,21 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                         <div className="md:hidden bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 backdrop-blur-md">
                                             <div className="text-xs text-primary font-bold tracking-wider uppercase mb-1">{property.from} to {property.to}</div>
                                             <h4 className="text-white text-xl font-bold mb-2">{property.company}</h4>
-                                            <div className="flex items-end gap-1">
-                                                <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
-                                                <span className="text-gray-500 text-sm pb-1 font-medium">/ ticket</span>
+                                            <div className="flex items-baseline justify-between flex-wrap gap-2">
+                                                <div className="flex items-end gap-1">
+                                                    <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
+                                                    <span className="text-gray-500 text-sm pb-1 font-medium">/ ticket</span>
+                                                </div>
+                                                {guests > 1 && (
+                                                    <div className="text-xs text-gray-400 font-semibold">
+                                                        Total ({guests} pass): <strong className="text-white">
+                                                            {formatPriceForCountry(
+                                                                getPriceAmount(property.price) * guests,
+                                                                property.to ? (property.to.includes(',') ? property.to.split(',')[1].trim() : property.to) : 'India'
+                                                            )}
+                                                        </strong>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -536,8 +548,8 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                 <Plane size={16} className="text-primary"/> Transport Options
                                             </h5>
                                             
-                                            <div className="flex items-center justify-between gap-3 mb-5">
-                                                <div className="flex-1">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
+                                                <div className="w-full sm:flex-1">
                                                     <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
                                                         <input
                                                             type="text"
@@ -550,8 +562,8 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-col items-center justify-center px-2">
-                                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-1 animate-pulse">
+                                                <div className="flex sm:flex-col items-center justify-center px-2 py-1 sm:py-0">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center sm:mb-1 animate-pulse">
                                                         {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
                                                         transportType === 'Train' ? <Train size={14} className="text-primary" /> :
                                                         transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
@@ -559,10 +571,10 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                         transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
                                                         <MapPin size={14} className="text-primary" />}
                                                     </div>
-                                                    <div className="w-12 border-t border-dashed border-primary/50"></div>
+                                                    <div className="hidden sm:block w-12 border-t border-dashed border-primary/50"></div>
                                                 </div>
 
-                                                <div className="flex-1">
+                                                <div className="w-full sm:flex-1">
                                                     <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
                                                         <input
                                                             type="text"

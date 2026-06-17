@@ -135,7 +135,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Flight Seats
     const renderFlightMap = () => {
         return (
-            <div className="relative mx-auto max-w-[340px] border-t-2 border-x-2 border-white/20 rounded-t-[140px] pt-24 pb-8 px-6 bg-white/[0.01] shadow-[inset_0_10px_30px_rgba(255,255,255,0.02)] mt-8 overflow-hidden">
+            <div className="relative mx-auto w-full max-w-[340px] border-t-2 border-x-2 border-white/20 rounded-t-[140px] pt-24 pb-8 px-3 sm:px-6 bg-white/[0.01] shadow-[inset_0_10px_30px_rgba(255,255,255,0.02)] mt-8 overflow-hidden">
                 {/* Airplane Cockpit outline */}
                 <div className="absolute top-0 inset-x-0 h-20 flex flex-col justify-center items-center border-b border-dashed border-white/10 bg-white/[0.02]">
                     <Plane className="w-6 h-6 text-white/40 mb-1 rotate-180" />
@@ -155,17 +155,17 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
                     {flightRows.map((row, rIndex) => (
                         <div key={rIndex} className="flex items-center justify-between">
                             {/* Left Side (A, B, C) */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-1 sm:gap-2">
                                 {row.slice(0, 3).map(seat => renderSeatButton(seat))}
                             </div>
 
                             {/* Aisle */}
-                            <div className="w-8 flex items-center justify-center">
+                            <div className="w-6 sm:w-8 flex items-center justify-center">
                                 <span className="text-[10px] font-bold text-gray-600">{rIndex + 1}</span>
                             </div>
 
                             {/* Right Side (D, E, F) */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-1 sm:gap-2">
                                 {row.slice(3).map(seat => renderSeatButton(seat))}
                             </div>
                         </div>
@@ -178,7 +178,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Train Map
     const renderTrainMap = () => {
         return (
-            <div className="mx-auto max-w-[380px] border-y border-x-2 border-white/20 rounded-2xl p-4 bg-white/[0.01] shadow-inner mt-8 relative">
+            <div className="mx-auto w-full max-w-[380px] border-y border-x-2 border-white/20 rounded-2xl p-2 sm:p-4 bg-white/[0.01] shadow-inner mt-8 relative">
                 {/* Tracks decoration */}
                 <div className="absolute -left-4 inset-y-0 w-1 flex flex-col justify-between pointer-events-none opacity-40">
                     {[1,2,3,4,5,6,7,8,9,10].map(i => <div key={i} className="h-1 w-2 bg-slate-600"></div>)}
@@ -197,12 +197,12 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
 
                             <div className="flex justify-between items-center relative z-10">
                                 {/* Left Side: 3 Berths (Lower, Middle, Upper) */}
-                                <div className="flex gap-2">
+                                <div className="flex gap-1 sm:gap-2">
                                     {row.left.map(seat => renderSeatButton(seat, true))}
                                 </div>
 
                                 {/* Right Side: 2 Side Berths (Side Lower, Side Upper) */}
-                                <div className="flex gap-2">
+                                <div className="flex gap-1 sm:gap-2">
                                     {row.right.map(seat => renderSeatButton(seat, true))}
                                 </div>
                             </div>
@@ -216,7 +216,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Bus Map
     const renderBusMap = () => {
         return (
-            <div className="mx-auto max-w-[280px] border-4 border-white/10 rounded-3xl p-5 bg-white/[0.01] shadow-inner mt-8 relative">
+            <div className="mx-auto w-full max-w-[280px] border-4 border-white/10 rounded-3xl p-3 sm:p-5 bg-white/[0.01] shadow-inner mt-8 relative">
                 {/* Driver Section */}
                 <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
                     <div className="flex flex-col">
@@ -238,7 +238,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
                     {busRows.map((row, rIndex) => (
                         <div key={rIndex} className="flex justify-between items-center">
                             {/* Left Side (A, B) */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-1 sm:gap-2">
                                 {row.slice(0, 2).map(seat => renderSeatButton(seat))}
                             </div>
 
@@ -248,7 +248,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
                             </div>
 
                             {/* Right Side (C, D) */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-1 sm:gap-2">
                                 {row.slice(2).map(seat => renderSeatButton(seat))}
                             </div>
                         </div>
