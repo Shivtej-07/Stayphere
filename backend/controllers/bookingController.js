@@ -17,7 +17,8 @@ exports.createBooking = async (req, res) => {
             travelingFrom,
             transportType,
             price,
-            paymentId
+            paymentId,
+            seats
         } = req.body;
 
         const booking = await Booking.create({
@@ -31,7 +32,8 @@ exports.createBooking = async (req, res) => {
             travelingFrom,
             transportType,
             price,
-            paymentId
+            paymentId,
+            seats
         });
 
         res.status(201).json(booking);

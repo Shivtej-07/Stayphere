@@ -34,7 +34,10 @@ const TransportSearch = ({ onSearch, availableLocations }) => {
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
+                            onClick={() => {
+                                setActiveTab(tab.id);
+                                onSearch({ ...searchParams, type: tab.id });
+                            }}
                             className={`flex items-center space-x-2 px-6 py-3 rounded-full transition-all duration-300 font-medium ${activeTab === tab.id
                                     ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-105'
                                     : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'

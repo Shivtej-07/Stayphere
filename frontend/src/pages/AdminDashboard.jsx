@@ -98,7 +98,14 @@ const AdminDashboard = () => {
                 </nav>
 
                 <div className="p-4 border-t border-white/5">
-                    <button className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors">
+                    <button 
+                        onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            window.location.href = '/login';
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
+                    >
                         <LogOut size={20} />
                         <span className={`font-medium ${!isSidebarOpen && 'hidden'}`}>Logout</span>
                     </button>

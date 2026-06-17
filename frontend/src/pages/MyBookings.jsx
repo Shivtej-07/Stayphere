@@ -124,11 +124,18 @@ const MyBookings = () => {
                                                     <MapPin size={14} className="mr-1" />
                                                     {booking.location}
                                                 </div>
-                                                {(booking.travelingFrom && booking.travelingFrom !== 'Not specified') && (
-                                                    <div className="text-xs px-2 py-1 bg-white/5 rounded-md text-gray-400 border border-white/10">
-                                                        From <strong>{booking.travelingFrom}</strong> via {booking.transportType || 'None'}
-                                                    </div>
-                                                )}
+                                                <div className="flex items-center gap-2">
+                                                    {(booking.travelingFrom && booking.travelingFrom !== 'Not specified') && (
+                                                        <div className="text-xs px-2 py-1 bg-white/5 rounded-md text-gray-400 border border-white/10">
+                                                            From <strong>{booking.travelingFrom}</strong> via {booking.transportType || 'None'}
+                                                        </div>
+                                                    )}
+                                                    {booking.seats && booking.seats.length > 0 && (
+                                                        <div className="text-xs px-2.5 py-1 bg-primary/10 rounded-md text-primary border border-primary/20 font-bold">
+                                                            Seats: {booking.seats.join(', ')}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4 mb-4">

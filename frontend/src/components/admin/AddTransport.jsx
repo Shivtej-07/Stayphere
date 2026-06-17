@@ -29,6 +29,13 @@ const AddTransport = ({ setMessage, onSuccess }) => {
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessage('Error adding transport: ' + (error.response?.data?.message || error.message));
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
         }
     };
 

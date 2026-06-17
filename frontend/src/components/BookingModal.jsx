@@ -1,9 +1,12 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, User, CheckCircle, CreditCard, Lock, Loader2, MapPin, Plane, Train, Bus, Car, Ship, ArrowRight } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './CheckoutForm';
 import { API_BASE_URL } from '../config';
+import SeatSelector from './SeatSelector';
+import { formatPriceForCountry } from '../utils/currencyUtil';
 
 const stripePromise = loadStripe("pk_test_51RxejZPSVmcc3eBkvjEuMzJoMGGUIUoVwE9wwhMkRaCX0jBdQFDMR4cvINi5VHmACuiHmRvxJPtRxaTqo6AJnx1M00flLHoRs5");
 
@@ -16,6 +19,9 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
     const [paymentMethod, setPaymentMethod] = useState(null); // 'card', 'gpay', 'phonepe', 'paytm', 'qr'
     const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle', 'processing', 'success'
     const [clientSecret, setClientSecret] = useState("");
+    const [selectedSeats, setSelectedSeats] = useState([]);
+
+    const isDirectTransport = property && (property.type === 'flight' || property.type === 'train' || property.type === 'bus' || property.type === 'car');
 
     // Helper to safely get price amount as number
     const getPriceAmount = (price) => {
@@ -24,13 +30,37 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
     };
 
+    const getPropertyLocation = (prop) => {
+        if (!prop) return '';
+        if (typeof prop.location === 'string') return prop.location;
+        if (prop.city) return prop.city;
+        if (prop.address) return prop.address;
+        return '';
+    };
+
     // Calculate dynamic transport options
     const availableTransports = React.useMemo(() => {
-        if (!property?.location) return ['Flight', 'Train', 'Bus', 'Cab', 'Local'];
-        const loc = property.location.toLowerCase();
+        const locationStr = getPropertyLocation(property);
+        if (!locationStr) return ['Flight', 'Local'];
+        const loc = locationStr.toLowerCase();
         
-        // Let's assume domestic involves India since user is from Pune
-        const isDomestic = loc.includes('india') || loc.includes('mumbai') || loc.includes('delhi');
+        // Check if destination is international
+        const isInternational = 
+            loc.includes('france') ||
+            loc.includes('paris') ||
+            loc.includes('usa') ||
+            loc.includes('america') ||
+            loc.includes('london') ||
+            loc.includes('uk') ||
+            loc.includes('switzerland') ||
+            loc.includes('alps') ||
+            loc.includes('maldives') ||
+            loc.includes('bali') ||
+            loc.includes('indonesia') ||
+            loc.includes('sydney') ||
+            loc.includes('australia') ||
+            loc.includes('dubai');
+        const isDomestic = !isInternational;
         
         // Places that require or support shipping/sea paths
         const isSeaAccessible = loc.includes('bali') || loc.includes('maldives') || loc.includes('island') || loc.includes('sea') || loc.includes('ocean');
@@ -45,9 +75,9 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
 
         // Domestic options
         if (isSeaAccessible) {
-            return ['Flight', 'Train', 'Bus', 'Cab', 'Ship', 'Local'];
+            return ['Flight', 'Ship', 'Local'];
         }
-        return ['Flight', 'Train', 'Bus', 'Cab', 'Local'];
+        return ['Flight', 'Local'];
     }, [property]);
 
     // Ensure selected transport is valid
@@ -57,12 +87,41 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         }
     }, [availableTransports, transportType]);
 
+    // Reset and pre-fill state when modal opens
+    useEffect(() => {
+        if (isOpen && property) {
+            setStep(1);
+            setPaymentMethod(null);
+            setPaymentStatus('idle');
+            setClientSecret("");
+            setSelectedSeats([]);
+            
+            if (isDirectTransport && property.departureTime) {
+                const depDate = new Date(property.departureTime).toISOString().split('T')[0];
+                const arrDate = property.arrivalTime ? new Date(property.arrivalTime).toISOString().split('T')[0] : depDate;
+                setDates({ checkIn: depDate, checkOut: arrDate });
+                setTravelingFrom(property.from || '');
+                setTransportType(
+                    property.type === 'flight' ? 'Flight' : 
+                    property.type === 'train' ? 'Train' : 
+                    property.type === 'bus' ? 'Bus' : 
+                    property.type === 'car' ? 'Cab' : 'Local'
+                );
+                setGuests(1); // Default to 1 passenger for direct travel
+            } else {
+                setDates({ checkIn: '', checkOut: '' });
+                setTravelingFrom('');
+                setGuests(2); // Default to 2 for stays
+            }
+        }
+    }, [isOpen, property, isDirectTransport]);
+
     // Fetch Client Secret when entering payment step
     useEffect(() => {
         let isMounted = true;
 
         if (step === 2 && !clientSecret && property) {
-            const amount = getPriceAmount(property.price);
+            const amount = getPriceAmount(property.price) * (isDirectTransport ? guests : 1);
 
             fetch(`${API_BASE_URL}/payments/create-payment-intent`, {
                 method: "POST",
@@ -85,12 +144,17 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         return () => {
             isMounted = false;
         };
-    }, [step, clientSecret, property]);
+    }, [step, clientSecret, property, guests, isDirectTransport]);
 
     if (!isOpen || !property) return null;
 
     const handleDetailsSubmit = (e) => {
         e.preventDefault();
+        const requiresSeats = (isDirectTransport && property.type !== 'car') || (type !== 'hotel' && ['flight', 'train', 'bus'].includes(transportType.toLowerCase()));
+        if (requiresSeats && selectedSeats.length !== Number(guests)) {
+            alert(`Please select exactly ${guests} seat(s) before continuing.`);
+            return;
+        }
         setStep(2);
     };
 
@@ -101,15 +165,21 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         try {
             const bookingData = {
                 hotelName: property.name,
-                location: property.location || property.from, // Fallback for transport
-                image: property.image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000", // Fallback image
+                location: getPropertyLocation(property) || property.from, // Fallback for transport
+                image: property.image || (property.photos && property.photos[0]) || (
+                    property.type === 'flight' ? "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" : 
+                    property.type === 'train' ? "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=800&q=80" : 
+                    property.type === 'car' ? "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80" : 
+                    "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80"
+                ), // Fallback images
                 checkIn: dates.checkIn,
                 checkOut: dates.checkOut,
                 guests: guests,
                 travelingFrom: travelingFrom,
                 transportType: transportType,
-                price: getPriceAmount(property.price),
-                paymentId: paymentId
+                price: getPriceAmount(property.price) * (isDirectTransport ? guests : 1),
+                paymentId: paymentId,
+                seats: selectedSeats
             };
 
             const res = await fetch(`${API_BASE_URL}/bookings`, {
@@ -146,7 +216,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         // REPLACE 'merchant@upi' WITH YOUR ACTUAL VPA
         const vpa = 'merchant@upi';
         const payeeName = 'Dharam Yatra';
-        const amount = getPriceAmount(property.price);
+        const amount = getPriceAmount(property.price) * (isDirectTransport ? guests : 1);
         const transactionRef = 'TRX' + Date.now();
 
         const upiUrl = `upi://pay?pa=${vpa}&pn=${payeeName}&tr=${transactionRef}&am=${amount}&cu=INR`;
@@ -177,10 +247,13 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
 
         if (!currentBrand) return null;
 
-        const amount = getPriceAmount(property.price);
+        const amount = getPriceAmount(property.price) * (isDirectTransport ? guests : 1);
         const vpa = 'merchant@upi';
         const upiUrl = `upi://pay?pa=${vpa}&pn=Dharam Yatra&am=${amount}&cu=INR`;
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+
+        const country = property.to ? (property.to.includes(',') ? property.to.split(',')[1].trim() : property.to) : 'India';
+        const formattedAmountString = formatPriceForCountry(amount, country);
 
         return (
             <div className={`absolute inset-0 z-20 flex flex-col items-center justify-center ${currentBrand.color} animate-fade-in text-center p-6`}>
@@ -206,7 +279,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 {paymentStatus !== 'success' && (
                     <div className={`space-y-2 ${currentBrand.text}`}>
                         <p className="text-sm opacity-80">
-                            {paymentMethod === 'qr' ? `Amount: ${property.price}` : `Please approve the payment of ${property.price} in your app.`}
+                            {paymentMethod === 'qr' ? `Amount: ${formattedAmountString}` : `Please approve the payment of ${formattedAmountString} in your app.`}
                         </p>
                         {paymentMethod !== 'qr' && (
                             <p className="text-xs opacity-60 max-w-[200px] mx-auto">
@@ -231,7 +304,12 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 {/* Left Side: Dynamic Animated Image Panel */}
                 <div className="hidden md:block md:w-1/2 relative bg-dark overflow-hidden group">
                     <img 
-                        src={property.image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000"} 
+                        src={property.image || (property.photos && property.photos[0]) || (
+                            property.type === 'flight' ? "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000" : 
+                            property.type === 'train' ? "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000" : 
+                            property.type === 'car' ? "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000" : 
+                            "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1000"
+                        )} 
                         alt={property.name}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
@@ -240,7 +318,12 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                     
                     {/* Animated Overlay Details */}
                     <div className="absolute bottom-0 left-0 p-8 w-full animate-slide-in-right" style={{animationDelay: '0.1s'}}>
-                        {type === 'hotel' ? (
+                        {isDirectTransport ? (
+                            <div className="inline-flex items-center space-x-2 bg-primary/20 backdrop-blur-md px-3 py-1.5 rounded-full text-primary border border-primary/30 mb-4 animate-pulse">
+                                {property.type === 'flight' ? <Plane size={14} /> : property.type === 'train' ? <Train size={14} /> : property.type === 'bus' ? <Bus size={14} /> : <Car size={14} />}
+                                <span className="text-xs font-bold uppercase tracking-wider">{property.type}</span>
+                            </div>
+                        ) : type === 'hotel' ? (
                             <div className="inline-flex items-center space-x-2 bg-primary/20 backdrop-blur-md px-3 py-1.5 rounded-full text-primary border border-primary/30 mb-4 animate-pulse">
                                 <MapPin size={14} />
                                 <span className="text-xs font-bold uppercase tracking-wider">{property.city || property.location || 'Destination'}</span>
@@ -257,14 +340,38 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                 </div>
                              )}
                              {property.rating && <span>•</span>}
-                             <span>Premium Stay</span>
+                             <span>
+                                 {isDirectTransport
+                                     ? property.type === 'flight'
+                                         ? 'Premium Flight'
+                                         : property.type === 'train'
+                                         ? 'Premium Railway Journey'
+                                         : property.type === 'bus'
+                                         ? 'Premium Coach Service'
+                                         : 'Premium Cab Service'
+                                     : 'Premium Stay'}
+                             </span>
                         </div>
                         
-                        <div className="flex items-baseline space-x-2">
-                            <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                                {property.price}
-                            </span>
-                            <span className="text-gray-400 font-medium tracking-wide">/ night</span>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-baseline space-x-2">
+                                <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                                    {property.price}
+                                </span>
+                                <span className="text-gray-400 font-medium tracking-wide">
+                                    {isDirectTransport ? '/ ticket' : '/ night'}
+                                </span>
+                            </div>
+                            {isDirectTransport && guests > 1 && (
+                                <span className="text-xs text-gray-400 font-semibold mt-1">
+                                    Total for {guests} passengers: <strong className="text-white">
+                                        {formatPriceForCountry(
+                                            getPriceAmount(property.price) * guests,
+                                            property.to ? (property.to.includes(',') ? property.to.split(',')[1].trim() : property.to) : 'India'
+                                        )}
+                                    </strong>
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -284,7 +391,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                             <div className="w-16"></div> /* Spacer */
                         )}
                         <h3 className="text-lg font-bold text-white text-center flex-1">
-                            {step === 1 ? 'Configure Stay' : step === 2 ? 'Secure Payment' : 'Confirmed'}
+                            {step === 1 ? (isDirectTransport ? 'Seat Selection' : 'Configure Stay') : step === 2 ? 'Secure Payment' : 'Confirmed'}
                         </h3>
                         <button
                             onClick={onClose}
@@ -314,134 +421,203 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                     <div className="p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar relative">
                         {step === 1 && (
                             <form onSubmit={handleDetailsSubmit} className="space-y-6 animate-slide-in-right" key="form-step-1">
-                                <div className="md:hidden bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 backdrop-blur-md">
-                                    <div className="text-xs text-primary font-bold tracking-wider uppercase mb-1">{property.city || property.location || 'Destination'}</div>
-                                    <h4 className="text-white text-xl font-bold mb-2">{property.name}</h4>
-                                    <div className="flex items-end gap-1">
-                                        <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
-                                        <span className="text-gray-500 text-sm pb-1 font-medium">/ night</span>
-                                    </div>
-                                </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2 group">
-                                    <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-in Date</label>
-                                    <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
-                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
-                                        <input
-                                            type="date"
-                                            required
-                                            min={new Date().toISOString().split('T')[0]}
-                                            className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
-                                            onChange={(e) => setDates({ ...dates, checkIn: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2 group">
-                                    <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-out Date</label>
-                                    <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
-                                        <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
-                                        <input
-                                            type="date"
-                                            required
-                                            min={dates.checkIn || new Date().toISOString().split('T')[0]}
-                                            className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
-                                            onChange={(e) => setDates({ ...dates, checkOut: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 group">
-                                <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Number of Guests</label>
-                                <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
-                                    <User size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
-                                    <select
-                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none appearance-none cursor-pointer"
-                                        value={guests}
-                                        onChange={(e) => setGuests(e.target.value)}
-                                    >
-                                        {[1, 2, 3, 4, 5, 6].map(num => (
-                                            <option key={num} value={num} className="bg-dark text-white">{num} {num === 1 ? 'Guest' : 'Guests'}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {type !== 'hotel' && (
-                                <div className="bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 rounded-2xl p-5 mt-4 relative overflow-hidden backdrop-blur-sm">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-                                    <h5 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                                        <Plane size={16} className="text-primary"/> Transport Options
-                                    </h5>
-                                    
-                                    <div className="flex items-center justify-between gap-3 mb-5">
-                                        <div className="flex-1">
-                                            <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    placeholder="Origin City"
-                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center placeholder-gray-600"
-                                                    value={travelingFrom}
-                                                    onChange={(e) => setTravelingFrom(e.target.value)}
-                                                />
+                                {isDirectTransport ? (
+                                    <>
+                                        <div className="md:hidden bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 backdrop-blur-md">
+                                            <div className="text-xs text-primary font-bold tracking-wider uppercase mb-1">{property.from} to {property.to}</div>
+                                            <h4 className="text-white text-xl font-bold mb-2">{property.company}</h4>
+                                            <div className="flex items-end gap-1">
+                                                <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
+                                                <span className="text-gray-500 text-sm pb-1 font-medium">/ ticket</span>
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col items-center justify-center px-2">
-                                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-1 animate-pulse">
-                                                {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
-                                                transportType === 'Train' ? <Train size={14} className="text-primary" /> :
-                                                transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
-                                                transportType === 'Cab' ? <Car size={14} className="text-primary" /> :
-                                                transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
-                                                <MapPin size={14} className="text-primary" />}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400 ml-1 font-medium">Departure Date & Time</label>
+                                                <div className="bg-black/40 border border-white/10 rounded-xl p-3 text-sm text-gray-300 font-medium flex items-center gap-2">
+                                                    <Calendar size={16} className="text-primary" />
+                                                    <span>
+                                                        {property.departureTime ? new Date(property.departureTime).toLocaleDateString() : 'N/A'} at{' '}
+                                                        {property.departureTime ? new Date(property.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="w-12 border-t border-dashed border-primary/50"></div>
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Passengers</label>
+                                                <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                                    <User size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
+                                                    <select
+                                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none appearance-none cursor-pointer"
+                                                        value={guests}
+                                                        onChange={(e) => {
+                                                            setGuests(Number(e.target.value));
+                                                            setSelectedSeats([]);
+                                                        }}
+                                                    >
+                                                        {[1, 2, 3, 4, 5, 6].map(num => (
+                                                            <option key={num} value={num} className="bg-dark text-white">{num} {num === 1 ? 'Passenger' : 'Passengers'}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="flex-1">
-                                            <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
-                                                <input
-                                                    type="text"
-                                                    readOnly
-                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center truncate"
-                                                    value={property.location ? property.location.split(',')[0] : "Destination"}
-                                                    title={property.location ? property.location.split(',')[0] : "Destination"}
-                                                />
+                                         {property.type !== 'car' && (
+                                             <SeatSelector
+                                                 type={property.type}
+                                                 numSeatsRequired={guests}
+                                                 selectedSeats={selectedSeats}
+                                                 onSelectSeats={setSelectedSeats}
+                                             />
+                                         )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="md:hidden bg-white/5 rounded-2xl p-5 border border-white/10 mb-6 backdrop-blur-md">
+                                            <div className="text-xs text-primary font-bold tracking-wider uppercase mb-1">{property.city || property.location || 'Destination'}</div>
+                                            <h4 className="text-white text-xl font-bold mb-2">{property.name}</h4>
+                                            <div className="flex items-end gap-1">
+                                                <p className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{property.price}</p> 
+                                                <span className="text-gray-500 text-sm pb-1 font-medium">/ night</span>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div className="space-y-2 group">
-                                        <label className="text-[10px] uppercase font-bold tracking-wider text-gray-500 ml-1">Select Transport</label>
-                                        <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors cursor-pointer hover:border-white/20">
-                                            <select
-                                                className="w-full bg-transparent text-white text-sm focus:outline-none appearance-none cursor-pointer pl-2"
-                                                value={transportType}
-                                                onChange={(e) => setTransportType(e.target.value)}
-                                            >
-                                                {availableTransports.map(mode => (
-                                                    <option key={mode} value={mode} className="bg-dark text-white p-2">
-                                                        {mode} Journey
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
 
-                            <button
-                                type="submit"
-                                className="w-full py-4 mt-6 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group"
-                            >
-                                <span>Continue to Payment</span>
-                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </form>
-                    )}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-in Date</label>
+                                                <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                                    <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
+                                                    <input
+                                                        type="date"
+                                                        required
+                                                        min={new Date().toISOString().split('T')[0]}
+                                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
+                                                        value={dates.checkIn}
+                                                        onChange={(e) => setDates({ ...dates, checkIn: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 group">
+                                                <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Check-out Date</label>
+                                                <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                                    <Calendar size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
+                                                    <input
+                                                        type="date"
+                                                        required
+                                                        min={dates.checkIn || new Date().toISOString().split('T')[0]}
+                                                        className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none [color-scheme:dark]"
+                                                        value={dates.checkOut}
+                                                        onChange={(e) => setDates({ ...dates, checkOut: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 group">
+                                            <label className="text-xs text-gray-400 ml-1 font-medium group-focus-within:text-primary transition-colors">Number of Guests</label>
+                                            <div className="relative bg-black/40 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+                                                <User size={16} className="absolute left-3 top-3.5 text-gray-500 group-focus-within:text-primary transition-colors" />
+                                                <select
+                                                    className="w-full bg-transparent text-white text-sm pl-8 focus:outline-none appearance-none cursor-pointer"
+                                                    value={guests}
+                                                    onChange={(e) => setGuests(e.target.value)}
+                                                >
+                                                    {[1, 2, 3, 4, 5, 6].map(num => (
+                                                        <option key={num} value={num} className="bg-dark text-white">{num} {num === 1 ? 'Guest' : 'Guests'}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 rounded-2xl p-5 mt-4 relative overflow-hidden backdrop-blur-sm">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                                            <h5 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                                <Plane size={16} className="text-primary"/> Transport Options
+                                            </h5>
+                                            
+                                            <div className="flex items-center justify-between gap-3 mb-5">
+                                                <div className="flex-1">
+                                                    <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                                                        <input
+                                                            type="text"
+                                                            required
+                                                            placeholder="Origin City"
+                                                            className="w-full bg-transparent text-white text-xs focus:outline-none text-center placeholder-gray-600"
+                                                            value={travelingFrom}
+                                                            onChange={(e) => setTravelingFrom(e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col items-center justify-center px-2">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-1 animate-pulse">
+                                                        {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
+                                                        transportType === 'Train' ? <Train size={14} className="text-primary" /> :
+                                                        transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
+                                                        transportType === 'Cab' ? <Car size={14} className="text-primary" /> :
+                                                        transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
+                                                        <MapPin size={14} className="text-primary" />}
+                                                    </div>
+                                                    <div className="w-12 border-t border-dashed border-primary/50"></div>
+                                                </div>
+
+                                                <div className="flex-1">
+                                                    <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
+                                                        <input
+                                                            type="text"
+                                                            readOnly
+                                                            className="w-full bg-transparent text-white text-xs focus:outline-none text-center truncate"
+                                                            value={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
+                                                            title={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="space-y-2 group">
+                                                <label className="text-[10px] uppercase font-bold tracking-wider text-gray-500 ml-1">Select Transport</label>
+                                                <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors cursor-pointer hover:border-white/20">
+                                                    <select
+                                                        className="w-full bg-transparent text-white text-sm focus:outline-none appearance-none cursor-pointer pl-2"
+                                                        value={transportType}
+                                                        onChange={(e) => {
+                                                            setTransportType(e.target.value);
+                                                            setSelectedSeats([]);
+                                                        }}
+                                                    >
+                                                        {availableTransports.map(mode => (
+                                                            <option key={mode} value={mode} className="bg-dark text-white p-2">
+                                                                {mode} Journey
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {['flight', 'train', 'bus'].includes(transportType.toLowerCase()) && (
+                                                <div className="mt-4">
+                                                    <SeatSelector
+                                                        type={transportType}
+                                                        numSeatsRequired={guests}
+                                                        selectedSeats={selectedSeats}
+                                                        onSelectSeats={setSelectedSeats}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    className="w-full py-4 mt-6 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group"
+                                >
+                                    <span>Continue to Payment</span>
+                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </form>
+                        )}
 
                     {step === 2 && (
                         <div className="space-y-6 animate-slide-in-right" key="form-step-2">

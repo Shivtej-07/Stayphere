@@ -60,7 +60,7 @@ const Footer = () => {
                         <h4 className="text-white font-bold mb-6">Explore</h4>
                         <ul className="space-y-4">
                             <li><Link to="/stays" className="text-gray-400 hover:text-primary transition-colors">Stays</Link></li>
-                            <li><Link to="/fligths" className="text-gray-400 hover:text-primary transition-colors">Flights</Link></li>
+                            <li><Link to="/transport" className="text-gray-400 hover:text-primary transition-colors">Flights</Link></li>
                             <li><Link to="/transport" className="text-gray-400 hover:text-primary transition-colors">Transport</Link></li>
                             <li><Link to="/destinations" className="text-gray-400 hover:text-primary transition-colors">Destinations</Link></li>
                         </ul>

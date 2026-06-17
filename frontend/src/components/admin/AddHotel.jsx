@@ -29,6 +29,13 @@ const AddHotel = ({ setMessage, onSuccess }) => {
             if (onSuccess) onSuccess();
         } catch (error) {
             setMessage('Error adding hotel: ' + (error.response?.data?.error || error.message));
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
         }
     };
 
