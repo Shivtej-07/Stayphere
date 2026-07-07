@@ -377,7 +377,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 </div>
 
                 {/* Right Side: Interactive Booking Form */}
-                <div className="w-full md:w-1/2 relative flex flex-col bg-[#121212] z-10 before:content-[''] before:absolute before:-left-[1px] before:top-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+                <div className="w-full md:w-1/2 h-full relative flex flex-col bg-[#121212] z-10 before:content-[''] before:absolute before:-left-[1px] before:top-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
                     {/* Processing Overlay for UPI/QR */}
                     {paymentStatus !== 'idle' && paymentMethod !== 'card' && step < 3 && renderProcessingScreen()}
 
