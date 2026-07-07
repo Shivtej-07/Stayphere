@@ -2,17 +2,12 @@ import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plane, Compass, RotateCcw } from 'lucide-react';
 
-const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [], onSelectSeats }) => {
+const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [], onSelectSeats, occupiedSeats = [] }) => {
     const normalizedType = String(type).toLowerCase();
 
-    // Deterministically seed some occupied seats based on the name of the seat
+    // Check if the seat is occupied in real-time
     const isOccupied = (seatId) => {
-        // Deterministic hash so it doesn't change on render
-        let hash = 0;
-        for (let i = 0; i < seatId.length; i++) {
-            hash = seatId.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        return hash % 3 === 0; // Roughly 33% of seats are occupied
+        return occupiedSeats.includes(seatId);
     };
 
     // 1. Generate Flight seats: Rows 1-8, Columns A,B,C, D,E,F
@@ -32,7 +27,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
             rows.push(rowSeats);
         }
         return rows;
-    }, []);
+    }, [occupiedSeats]);
 
     // 2. Generate Train seats: 6 Rows. Each row is a compartment
     // Left: Window (W), Middle (M), Lower (L)
@@ -61,7 +56,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
             });
         }
         return rows;
-    }, []);
+    }, [occupiedSeats]);
 
     // 3. Generate Bus seats: 8 Rows, 2x2 layout
     // Left: A, B. Right: C, D
@@ -81,7 +76,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
             rows.push(rowSeats);
         }
         return rows;
-    }, []);
+    }, [occupiedSeats]);
 
     // Handle seat click
     const handleSeatClick = (seatId) => {
@@ -135,7 +130,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Flight Seats
     const renderFlightMap = () => {
         return (
-            <div className="relative mx-auto w-full max-w-[340px] border-t-2 border-x-2 border-white/20 rounded-t-[140px] pt-24 pb-8 px-3 sm:px-6 bg-white/[0.01] shadow-[inset_0_10px_30px_rgba(255,255,255,0.02)] mt-8 overflow-hidden">
+            <div className="relative mx-auto w-full max-w-[290px] sm:max-w-[340px] border-t-2 border-x-2 border-white/20 rounded-t-[140px] pt-20 sm:pt-24 pb-8 px-2 sm:px-6 bg-white/[0.01] shadow-[inset_0_10px_30px_rgba(255,255,255,0.02)] mt-8 overflow-hidden">
                 {/* Airplane Cockpit outline */}
                 <div className="absolute top-0 inset-x-0 h-20 flex flex-col justify-center items-center border-b border-dashed border-white/10 bg-white/[0.02]">
                     <Plane className="w-6 h-6 text-white/40 mb-1 rotate-180" />
@@ -178,7 +173,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Train Map
     const renderTrainMap = () => {
         return (
-            <div className="mx-auto w-full max-w-[380px] border-y border-x-2 border-white/20 rounded-2xl p-2 sm:p-4 bg-white/[0.01] shadow-inner mt-8 relative">
+            <div className="mx-auto w-full max-w-[310px] sm:max-w-[380px] border-y border-x-2 border-white/20 rounded-2xl p-1 sm:p-4 bg-white/[0.01] shadow-inner mt-8 relative">
                 {/* Tracks decoration */}
                 <div className="absolute -left-4 inset-y-0 w-1 flex flex-col justify-between pointer-events-none opacity-40">
                     {[1,2,3,4,5,6,7,8,9,10].map(i => <div key={i} className="h-1 w-2 bg-slate-600"></div>)}
@@ -216,7 +211,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     // Renderer for Bus Map
     const renderBusMap = () => {
         return (
-            <div className="mx-auto w-full max-w-[280px] border-4 border-white/10 rounded-3xl p-3 sm:p-5 bg-white/[0.01] shadow-inner mt-8 relative">
+            <div className="mx-auto w-full max-w-[250px] sm:max-w-[280px] border-4 border-white/10 rounded-3xl p-2.5 sm:p-5 bg-white/[0.01] shadow-inner mt-8 relative">
                 {/* Driver Section */}
                 <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
                     <div className="flex flex-col">
@@ -279,14 +274,14 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
 
         if (isCompartment) {
             content = (
-                <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-center select-none text-[9px]">
+                <div className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl text-center select-none text-[8px] sm:text-[9px]">
                     <span className="font-extrabold uppercase leading-tight">{label.split(' ')[1]}</span>
-                    <span className={`text-[7px] font-bold opacity-75 mt-0.5 tracking-tighter truncate max-w-full ${isSelected ? 'text-white' : 'text-slate-500'}`}>{sub}</span>
+                    <span className={`text-[6px] sm:text-[7px] font-bold opacity-75 mt-0.5 tracking-tighter truncate max-w-full ${isSelected ? 'text-white' : 'text-slate-500'}`}>{sub}</span>
                 </div>
             );
         } else {
             content = (
-                <div className="flex items-center justify-center w-10 h-10 rounded-xl text-center select-none text-xs font-bold leading-none uppercase">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl text-center select-none text-[10px] sm:text-xs font-bold leading-none uppercase">
                     {label}
                 </div>
             );
@@ -317,7 +312,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
     };
 
     return (
-        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md">
+        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-3 sm:p-6 relative overflow-hidden backdrop-blur-md">
             {/* Background Glow */}
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-${styleConfig.accent}-500/5 rounded-full blur-3xl pointer-events-none`}></div>
 
@@ -345,7 +340,7 @@ const SeatSelector = ({ type = 'flight', numSeatsRequired = 1, selectedSeats = [
             {normalizedType === 'bus' && renderBusMap()}
 
             {/* Selection Legend */}
-            <div className="flex justify-center items-center gap-6 mt-8 border-t border-white/5 pt-5 text-xs">
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 mt-8 border-t border-white/5 pt-5 text-xs">
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-md bg-white border border-gray-300 shadow-md"></div>
                     <span className="text-gray-400 font-medium">Available</span>

@@ -15,11 +15,12 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
     const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
     const [guests, setGuests] = useState(2);
     const [travelingFrom, setTravelingFrom] = useState('');
-    const [transportType, setTransportType] = useState('Flight');
+    const [transportType, setTransportType] = useState('None');
     const [paymentMethod, setPaymentMethod] = useState(null); // 'card', 'gpay', 'phonepe', 'paytm', 'qr'
     const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle', 'processing', 'success'
     const [clientSecret, setClientSecret] = useState("");
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [occupiedSeats, setOccupiedSeats] = useState([]);
 
     const isDirectTransport = property && (property.type === 'flight' || property.type === 'train' || property.type === 'bus' || property.type === 'car');
 
@@ -41,7 +42,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
     // Calculate dynamic transport options
     const availableTransports = React.useMemo(() => {
         const locationStr = getPropertyLocation(property);
-        if (!locationStr) return ['Flight', 'Local'];
+        if (!locationStr) return ['None', 'Flight', 'Local'];
         const loc = locationStr.toLowerCase();
         
         // Check if destination is international
@@ -68,16 +69,16 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
         if (!isDomestic) {
             // Out of country
             if (isSeaAccessible) {
-                return ['Flight', 'Ship'];
+                return ['None', 'Flight', 'Ship'];
             }
-            return ['Flight']; // Only planes for landlocked out-country places like Swiss Alps
+            return ['None', 'Flight']; // Only planes for landlocked out-country places like Swiss Alps
         }
 
         // Domestic options
         if (isSeaAccessible) {
-            return ['Flight', 'Ship', 'Local'];
+            return ['None', 'Flight', 'Ship', 'Local'];
         }
-        return ['Flight', 'Local'];
+        return ['None', 'Flight', 'Local'];
     }, [property]);
 
     // Ensure selected transport is valid
@@ -112,9 +113,53 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 setDates({ checkIn: '', checkOut: '' });
                 setTravelingFrom('');
                 setGuests(2); // Default to 2 for stays
+                setTransportType('None');
             }
         }
     }, [isOpen, property, isDirectTransport]);
+
+    // Fetch occupied seats in real-time
+    useEffect(() => {
+        let isMounted = true;
+        
+        const fetchOccupiedSeats = async () => {
+            const requiresSeats = (isDirectTransport && property.type !== 'car') || 
+                (type !== 'hotel' && ['flight', 'train', 'bus'].includes(transportType.toLowerCase()));
+            
+            if (!requiresSeats) {
+                setOccupiedSeats([]);
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                if (isDirectTransport && property._id) {
+                    params.append('transportId', property._id);
+                } else {
+                    params.append('transportType', transportType);
+                    params.append('travelingFrom', travelingFrom);
+                    params.append('location', getPropertyLocation(property) || property.from);
+                    params.append('checkIn', dates.checkIn);
+                }
+
+                const res = await fetch(`${API_BASE_URL}/bookings/booked-seats?${params.toString()}`);
+                if (res.ok && isMounted) {
+                    const data = await res.json();
+                    setOccupiedSeats(data);
+                }
+            } catch (err) {
+                console.error("Error fetching booked seats:", err);
+            }
+        };
+
+        if (isOpen) {
+            fetchOccupiedSeats();
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, [isOpen, property, isDirectTransport, transportType, travelingFrom, dates.checkIn, type]);
 
     // Fetch Client Secret when entering payment step
     useEffect(() => {
@@ -172,14 +217,15 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                     property.type === 'car' ? "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80" : 
                     "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80"
                 ), // Fallback images
-                checkIn: dates.checkIn,
-                checkOut: dates.checkOut,
+                checkIn: isDirectTransport ? property.departureTime : dates.checkIn,
+                checkOut: isDirectTransport ? property.arrivalTime : dates.checkOut,
                 guests: guests,
                 travelingFrom: travelingFrom,
                 transportType: transportType,
                 price: getPriceAmount(property.price) * (isDirectTransport ? guests : 1),
                 paymentId: paymentId,
-                seats: selectedSeats
+                seats: selectedSeats,
+                transportId: isDirectTransport ? property._id : undefined
             };
 
             const res = await fetch(`${API_BASE_URL}/bookings`, {
@@ -260,10 +306,10 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                 <div className="scale-150 mb-8">{currentBrand.icon}</div>
 
                 {paymentMethod === 'qr' ? (
-                    <div className="bg-white p-4 rounded-xl shadow-xl mb-6 border-2 border-gray-200">
-                        {/* REAL Dynamic QR Code */}
-                        <img src={qrCodeUrl} alt="Payment QR" crossOrigin="anonymous" className="w-48 h-48 block" />
-                        <p className="text-center text-xs mt-2 font-mono uppercase text-gray-500">Scan with GPay/PhonePe/Paytm</p>
+                    <div className="bg-white p-4 rounded-xl shadow-xl mb-6 border-2 border-gray-200 flex flex-col items-center justify-center">
+                        {/* Real PhonePe QR Code */}
+                        <img src="/phonepe-qr.jpg" alt="PhonePe QR" className="w-44 h-auto block object-contain" />
+                        <p className="text-center text-[10px] mt-2 font-mono uppercase text-gray-500 font-bold">Scan with GPay/PhonePe/Paytm</p>
                     </div>
                 ) : (
                     <div className="w-20 h-20 relative mb-6">
@@ -293,13 +339,13 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-6 lg:p-8">
             <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
                 onClick={onClose}
             ></div>
 
-            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden animate-fade-in-scale h-[85vh] md:h-[600px] flex flex-col md:flex-row shadow-[0_0_50px_rgba(99,102,241,0.15)] glow-border">
+            <div className="relative bg-[#0a0a0a] border border-white/10 rounded-3xl w-full max-w-5xl shadow-2xl overflow-hidden animate-fade-in-scale h-[90vh] max-h-[90vh] md:h-[600px] flex flex-col md:flex-row shadow-[0_0_50px_rgba(99,102,241,0.15)] glow-border">
                 
                 {/* Left Side: Dynamic Animated Image Panel */}
                 <div className="hidden md:block md:w-1/2 relative bg-dark overflow-hidden group">
@@ -418,7 +464,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                         </div>
                     )}
 
-                    <div className="p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar relative">
+                    <div className="p-4 sm:p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar relative">
                         {step === 1 && (
                             <form onSubmit={handleDetailsSubmit} className="space-y-6 animate-slide-in-right" key="form-step-1">
                                 {isDirectTransport ? (
@@ -481,6 +527,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                  numSeatsRequired={guests}
                                                  selectedSeats={selectedSeats}
                                                  onSelectSeats={setSelectedSeats}
+                                                 occupiedSeats={occupiedSeats}
                                              />
                                          )}
                                     </>
@@ -548,46 +595,7 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                 <Plane size={16} className="text-primary"/> Transport Options
                                             </h5>
                                             
-                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
-                                                <div className="w-full sm:flex-1">
-                                                    <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
-                                                        <input
-                                                            type="text"
-                                                            required
-                                                            placeholder="Origin City"
-                                                            className="w-full bg-transparent text-white text-xs focus:outline-none text-center placeholder-gray-600"
-                                                            value={travelingFrom}
-                                                            onChange={(e) => setTravelingFrom(e.target.value)}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex sm:flex-col items-center justify-center px-2 py-1 sm:py-0">
-                                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center sm:mb-1 animate-pulse">
-                                                        {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
-                                                        transportType === 'Train' ? <Train size={14} className="text-primary" /> :
-                                                        transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
-                                                        transportType === 'Cab' ? <Car size={14} className="text-primary" /> :
-                                                        transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
-                                                        <MapPin size={14} className="text-primary" />}
-                                                    </div>
-                                                    <div className="hidden sm:block w-12 border-t border-dashed border-primary/50"></div>
-                                                </div>
-
-                                                <div className="w-full sm:flex-1">
-                                                    <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
-                                                        <input
-                                                            type="text"
-                                                            readOnly
-                                                            className="w-full bg-transparent text-white text-xs focus:outline-none text-center truncate"
-                                                            value={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
-                                                            title={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="space-y-2 group">
+                                            <div className="space-y-2 group mb-5">
                                                 <label className="text-[10px] uppercase font-bold tracking-wider text-gray-500 ml-1">Select Transport</label>
                                                 <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary transition-colors cursor-pointer hover:border-white/20">
                                                     <select
@@ -600,22 +608,66 @@ const BookingModal = ({ isOpen, onClose, property, type }) => {
                                                     >
                                                         {availableTransports.map(mode => (
                                                             <option key={mode} value={mode} className="bg-dark text-white p-2">
-                                                                {mode} Journey
+                                                                {mode === 'None' ? 'No Transport Needed' : `${mode} Journey`}
                                                             </option>
                                                         ))}
                                                     </select>
                                                 </div>
                                             </div>
 
-                                            {['flight', 'train', 'bus'].includes(transportType.toLowerCase()) && (
-                                                <div className="mt-4">
-                                                    <SeatSelector
-                                                        type={transportType}
-                                                        numSeatsRequired={guests}
-                                                        selectedSeats={selectedSeats}
-                                                        onSelectSeats={setSelectedSeats}
-                                                    />
-                                                </div>
+                                            {transportType !== 'None' && (
+                                                <>
+                                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
+                                                        <div className="w-full sm:flex-1">
+                                                            <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                                                                <input
+                                                                    type="text"
+                                                                    required={transportType !== 'None'}
+                                                                    placeholder="Origin City"
+                                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center placeholder-gray-600"
+                                                                    value={travelingFrom}
+                                                                    onChange={(e) => setTravelingFrom(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex sm:flex-col items-center justify-center px-2 py-1 sm:py-0">
+                                                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center sm:mb-1 animate-pulse">
+                                                                {transportType === 'Flight' ? <Plane size={14} className="text-primary" /> :
+                                                                transportType === 'Train' ? <Train size={14} className="text-primary" /> :
+                                                                transportType === 'Bus' ? <Bus size={14} className="text-primary" /> :
+                                                                transportType === 'Cab' ? <Car size={14} className="text-primary" /> :
+                                                                transportType === 'Ship' ? <Ship size={14} className="text-primary" /> :
+                                                                <MapPin size={14} className="text-primary" />}
+                                                            </div>
+                                                            <div className="hidden sm:block w-12 border-t border-dashed border-primary/50"></div>
+                                                        </div>
+
+                                                        <div className="w-full sm:flex-1">
+                                                            <div className="relative bg-[#111] border border-white/5 rounded-xl p-3 opacity-60">
+                                                                <input
+                                                                    type="text"
+                                                                    readOnly
+                                                                    className="w-full bg-transparent text-white text-xs focus:outline-none text-center truncate"
+                                                                    value={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
+                                                                    title={getPropertyLocation(property) ? getPropertyLocation(property).split(',')[0] : "Destination"}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {['flight', 'train', 'bus'].includes(transportType.toLowerCase()) && (
+                                                        <div className="mt-4">
+                                                            <SeatSelector
+                                                                type={transportType}
+                                                                numSeatsRequired={guests}
+                                                                selectedSeats={selectedSeats}
+                                                                onSelectSeats={setSelectedSeats}
+                                                                occupiedSeats={occupiedSeats}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
                                     </>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Ensure CSS is imported if not global, but we added it globally too.
 import { MapPin } from 'lucide-react';
@@ -26,7 +26,7 @@ function RecenterMap({ lat, lng }) {
     return null;
 }
 
-const MapComponent = ({ center, zoom = 13, markers = [], height = "400px" }) => {
+const MapComponent = ({ center, zoom = 13, markers = [], polyline = null, height = "400px" }) => {
     // center prop should be [lat, lng]
     if (!center) return null;
 
@@ -39,8 +39,16 @@ const MapComponent = ({ center, zoom = 13, markers = [], height = "400px" }) => 
                 />
                 <RecenterMap lat={center[0]} lng={center[1]} />
 
+                {polyline && (
+                    <Polyline positions={polyline} color="#ec4899" weight={4} dashArray="6, 12" />
+                )}
+
                 {markers.map((marker, index) => (
-                    <Marker key={index} position={marker.position}>
+                    <Marker 
+                        key={index} 
+                        position={marker.position}
+                        icon={marker.customIcon || DefaultIcon}
+                    >
                         <Popup>
                             <div className="text-gray-900 font-sans">
                                 <strong className="block text-sm mb-1">{marker.title}</strong>

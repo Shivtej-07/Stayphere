@@ -45,6 +45,10 @@ const BookingSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+        transportId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Transport',
+        },
         price: {
             type: Number, // Total price paid
             required: true,
