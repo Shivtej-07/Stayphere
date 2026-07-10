@@ -18,11 +18,24 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 // Component to recenter map when coordinates change
-function RecenterMap({ lat, lng }) {
+function RecenterMap({ lat, lng, polyline }) {
     const map = useMap();
     useEffect(() => {
-        map.setView([lat, lng]);
-    }, [lat, lng, map]);
+        if (!polyline || polyline.length === 0) {
+            map.setView([lat, lng]);
+        }
+    }, [lat, lng, polyline, map]);
+    return null;
+}
+
+// Component to fit map bounds to polyline when active
+function FitBounds({ polyline }) {
+    const map = useMap();
+    useEffect(() => {
+        if (polyline && polyline.length > 0) {
+            map.fitBounds(polyline, { padding: [50, 50], maxZoom: 15 });
+        }
+    }, [polyline, map]);
     return null;
 }
 
@@ -37,10 +50,11 @@ const MapComponent = ({ center, zoom = 13, markers = [], polyline = null, height
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <RecenterMap lat={center[0]} lng={center[1]} />
+                <RecenterMap lat={center[0]} lng={center[1]} polyline={polyline} />
+                <FitBounds polyline={polyline} />
 
                 {polyline && (
-                    <Polyline positions={polyline} color="#ec4899" weight={4} dashArray="6, 12" />
+                    <Polyline positions={polyline} color="#3b82f6" weight={5} dashArray="2, 8" lineCap="round" />
                 )}
 
                 {markers.map((marker, index) => (
